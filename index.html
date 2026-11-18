@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thiệp mời tốt nghiệp - Tân cử nhân</title>
+<style>
+:root{--gold:#c7a45b;--cream:#f8f3e8;--dark:#27231d}
+*{box-sizing:border-box} body{margin:0;background:#eee8dc;color:var(--dark);font-family:Georgia,'Times New Roman',serif}
+.page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+.card{width:min(920px,100%);min-height:720px;background:var(--cream);border:1px solid #d8c79e;box-shadow:0 20px 70px #0002;position:relative;overflow:hidden}
+.card:before{content:"";position:absolute;inset:14px;border:1px solid #d8c79e;pointer-events:none}
+.content{position:relative;padding:64px 54px;text-align:center;min-height:720px}
+.kicker{letter-spacing:5px;font-size:13px;color:#9b7b3c;text-transform:uppercase}
+h1{font-size:46px;line-height:1.1;margin:18px 0 8px;font-weight:500}
+.subtitle{font-size:18px;letter-spacing:2px;margin-bottom:30px}
+.portrait{width:180px;height:180px;border-radius:50%;object-fit:cover;border:5px solid #fff;box-shadow:0 8px 28px #0002;margin:10px auto 22px;display:block}
+.name{font-size:30px;color:#9b7b3c;font-weight:bold}
+.info{margin:26px auto;max-width:620px;font-size:16px;line-height:1.8}
+.event{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:30px auto;max-width:700px}
+.box{border-top:1px solid #d8c79e;border-bottom:1px solid #d8c79e;padding:14px 8px}
+.label{font-size:11px;letter-spacing:2px;color:#9b7b3c}
+.value{font-size:17px;margin-top:5px}
+.map{display:inline-block;text-decoration:none;background:var(--dark);color:#fff;padding:12px 24px;border-radius:999px;font-family:Arial,sans-serif;font-size:14px}
+.note{margin-top:28px;font-style:italic;color:#766c5d}
+@media(max-width:600px){.content{padding:50px 28px;min-height:680px}h1{font-size:34px}.portrait{width:145px;height:145px}.event{grid-template-columns:1fr}.page{padding:12px}}
+</style>
+</head>
+<body>
+<main class="page">
+<section class="card">
+<div class="content">
+<div class="kicker">Graduation Invitation</div>
+<h1>THIỆP MỜI DỰ LỄ TỐT NGHIỆP</h1>
+<div class="subtitle">Trân trọng kính mời</div>
+
+<!-- ĐỔI ẢNH: thay assets/portrait.jpg bằng ảnh chân dung của tân cử nhân -->
+<img class="portrait" src="assets/portrait.jpg" alt="Ảnh chân dung tân cử nhân">
+
+<div class="name">NGUYỄN VĂN MINH</div>
+<div class="info">
+Trân trọng mời bạn và gia đình đến chung vui trong ngày lễ tốt nghiệp,
+đánh dấu một chặng đường đáng nhớ và một khởi đầu mới.
+</div>
+
+<div class="event">
+<div class="box"><div class="label">THỜI GIAN</div><div class="value">08:00 · 15/12/2026</div></div>
+<div class="box"><div class="label">ĐỊA ĐIỂM</div><div class="value">Hội trường A · Đại học ABC</div></div>
+<div class="box"><div class="label">CHƯƠNG TRÌNH</div><div class="value">Lễ tốt nghiệp & chụp ảnh</div></div>
+</div>
+
+<a class="map" href="https://maps.google.com/?q=Đại+học+ABC+TP.HCM" target="_blank">📍 MỞ GOOGLE MAPS</a>
+<div class="note">“Một hành trình khép lại — một hành trình mới bắt đầu.”</div>
+</div>
+</section>
+</main>
+</body>
+</html>
