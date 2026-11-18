@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thư mời tham dự Lễ Tốt Nghiệp</title>
+    <title>Thư Mời Lễ Tốt Nghiệp</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -28,7 +28,7 @@
         .card-container {
             width: 100%;
             max-width: 420px;
-            min-height: 820px;
+            min-height: 830px;
             perspective: 1600px;
             position: relative;
         }
@@ -36,7 +36,7 @@
         /* TRANG BÊN TRONG THIỆP */
         .card-inside {
             width: 100%;
-            min-height: 820px;
+            min-height: 830px;
             border-radius: 22px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55);
             padding: 22px 16px;
@@ -195,7 +195,7 @@
             position: relative;
             display: flex;
             align-items: center;
-            min-height: 165px;
+            min-height: 160px;
             margin: 2px -16px 4px -16px;
             padding-right: 16px;
             overflow: hidden;
@@ -205,8 +205,8 @@
             position: absolute;
             left: 0;
             top: 0;
-            width: 132px;
-            height: 176px;
+            width: 128px;
+            height: 170px;
             z-index: 1;
             -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 58%, rgba(0,0,0,0) 100%),
                                 linear-gradient(to bottom, rgba(0,0,0,1) 76%, rgba(0,0,0,0) 100%);
@@ -279,9 +279,9 @@
             padding: 0 4px;
         }
 
-        /* DẢI HÌNH ẢNH KỶ NIỆM TRƯỢT NGANG */
-        .gallery-wrapper {
-            margin-bottom: 8px;
+        /* THƯỚC PHIM ĐIỆN ẢNH CHẠY TỰ ĐỘNG (CINEMATIC FILM REEL) */
+        .film-reel-wrapper {
+            margin: 0 -16px 8px -16px; /* Tràn sát 2 mép thiệp */
             text-align: left;
         }
 
@@ -289,43 +289,99 @@
             font-size: 9px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             color: #475569;
             margin-bottom: 4px;
-            padding-left: 2px;
+            padding-left: 18px;
         }
 
-        .photo-strip {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: none; /* Ẩn thanh cuộn Firefox */
-        }
-
-        .photo-strip::-webkit-scrollbar {
-            display: none; /* Ẩn thanh cuộn Chrome/Safari */
-        }
-
-        .photo-strip-item {
-            flex: 0 0 78px;
-            height: 104px; /* Tỷ lệ 3:4 đồng bộ */
-            border-radius: 8px;
+        .film-reel-container {
+            position: relative;
+            background: #0f172a;
+            padding: 13px 0;
             overflow: hidden;
-            background: #e2e8f0;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
-            border: 1.5px solid rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
+            /* Hiệu ứng mờ nhẹ 2 mép trái phải như máy chiếu */
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,1) 8%, rgba(0,0,0,1) 92%, rgba(0,0,0,0.4) 100%);
+            mask-image: linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,1) 8%, rgba(0,0,0,1) 92%, rgba(0,0,0,0.4) 100%);
         }
 
-        .photo-strip-item img {
+        /* Răng cưa lỗ phim cổ điển trên và dưới */
+        .film-reel-container::before,
+        .film-reel-container::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background-image: repeating-linear-gradient(
+                to right,
+                transparent 0px,
+                transparent 6px,
+                rgba(255, 255, 255, 0.75) 6px,
+                rgba(255, 255, 255, 0.75) 14px
+            );
+            z-index: 2;
+        }
+
+        .film-reel-container::before { top: 3.5px; }
+        .film-reel-container::after { bottom: 3.5px; }
+
+        /* Dải băng phim chuyển động vô tận */
+        .film-track {
+            display: flex;
+            gap: 8px;
+            width: max-content;
+            animation: rollFilm 18s linear infinite;
+        }
+
+        /* Tạm dừng cuộn phim khi chạm hoặc di chuột vào để xem rõ */
+        .film-reel-container:hover .film-track,
+        .film-reel-container:active .film-track {
+            animation-play-state: paused;
+        }
+
+        @keyframes rollFilm {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .film-frame {
+            position: relative;
+            width: 82px;
+            height: 108px; /* Tỷ lệ 3:4 chuẩn khung phim */
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1.5px solid #334155;
+            background: #1e293b;
+            flex-shrink: 0;
+        }
+
+        .film-frame img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s ease;
+            filter: contrast(1.04) saturate(1.05);
+            transition: transform 0.4s ease;
         }
 
-        .photo-strip-item:hover img {
-            transform: scale(1.06);
+        .film-frame:hover img {
+            transform: scale(1.08);
+        }
+
+        /* Nhãn năm/mốc nhỏ góc khung phim */
+        .film-stamp {
+            position: absolute;
+            bottom: 3px;
+            right: 4px;
+            font-size: 7px;
+            font-weight: 700;
+            color: #fbbf24;
+            background: rgba(0, 0, 0, 0.65);
+            padding: 1px 4px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+            font-family: monospace;
         }
 
         /* Đồng hồ đếm ngược */
@@ -513,9 +569,8 @@
             cursor: pointer;
         }
 
-        /* Bảng tin lời chúc hiển thị trực tiếp */
         .wish-feed {
-            max-height: 48px;
+            max-height: 46px;
             overflow-y: auto;
             margin-top: 5px;
             display: flex;
@@ -675,7 +730,6 @@
 </head>
 <body>
 
-    <!-- Nhạc nền du dương (Bạn có thể thay đường dẫn file mp3 nhạc của bạn tại src) -->
     <audio id="bgMusic" loop>
         <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
     </audio>
@@ -697,7 +751,6 @@
             <div class="card-bg-overlay"></div>
 
             <div class="card-content-layer">
-                <!-- Nút điều khiển nhạc nền -->
                 <button class="music-toggle" id="musicBtn" onclick="toggleMusic(event)" title="Bật/Tắt nhạc">🎵</button>
 
                 <div>
@@ -727,15 +780,25 @@
                         "Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"
                     </p>
 
-                    <!-- Dải hình ảnh kỷ niệm thanh xuân (Trượt ngang) -->
-                    <div class="gallery-wrapper text-reveal d-3" onclick="event.stopPropagation()">
-                        <div class="section-mini-label">✨ Khoảnh khắc thanh xuân</div>
-                        <div class="photo-strip">
-                            <!-- Bạn thay pic1.jpg, pic2.jpg... bằng tên file ảnh bạn up lên GitHub -->
-                            <div class="photo-strip-item"><img src="portrait.jpg" alt="Kỷ niệm 1"></div>
-                            <div class="photo-strip-item"><img src="bg.jpg" alt="Kỷ niệm 2"></div>
-                            <div class="photo-strip-item"><img src="portrait.jpg" alt="Kỷ niệm 3"></div>
-                            <div class="photo-strip-item"><img src="bg.jpg" alt="Kỷ niệm 4"></div>
+                    <!-- THƯỚC PHIM KỶ NIỆM CHẠY TỰ ĐỘNG -->
+                    <div class="film-reel-wrapper text-reveal d-3" onclick="event.stopPropagation()">
+                        <div class="section-mini-label">🎞️ Thước phim thanh xuân</div>
+                        <div class="film-reel-container">
+                            <div class="film-track">
+                                <!-- Bộ ảnh 1 (Bạn thay tên file ảnh kỷ niệm của bạn vào đây) -->
+                                <div class="film-frame"><img src="portrait.jpg" alt="2022"><span class="film-stamp">2022</span></div>
+                                <div class="film-frame"><img src="bg.jpg" alt="2023"><span class="film-stamp">2023</span></div>
+                                <div class="film-frame"><img src="portrait.jpg" alt="2024"><span class="film-stamp">2024</span></div>
+                                <div class="film-frame"><img src="bg.jpg" alt="2025"><span class="film-stamp">2025</span></div>
+                                <div class="film-frame"><img src="portrait.jpg" alt="2026"><span class="film-stamp">2026</span></div>
+
+                                <!-- Bộ ảnh 2 (Lặp lại giống hệt bộ 1 để cuộn nối đuôi vô tận không bị giật) -->
+                                <div class="film-frame"><img src="portrait.jpg" alt="2022"><span class="film-stamp">2022</span></div>
+                                <div class="film-frame"><img src="bg.jpg" alt="2023"><span class="film-stamp">2023</span></div>
+                                <div class="film-frame"><img src="portrait.jpg" alt="2024"><span class="film-stamp">2024</span></div>
+                                <div class="film-frame"><img src="bg.jpg" alt="2025"><span class="film-stamp">2025</span></div>
+                                <div class="film-frame"><img src="portrait.jpg" alt="2026"><span class="film-stamp">2026</span></div>
+                            </div>
                         </div>
                     </div>
 
@@ -787,7 +850,6 @@
                             <input type="text" id="guestWish" class="wish-input" placeholder="Gửi lời chúc đến Nguyễn...">
                             <button class="btn-wish" onclick="sendWish()">Gửi</button>
                         </div>
-                        <!-- Danh sách lời chúc hiển thị ngay -->
                         <div class="wish-feed" id="wishFeed">
                             <div class="wish-feed-item"><b>Minh Anh:</b> Chúc mừng tân cử nhân Luật Kinh Tế nhé! 🎉</div>
                         </div>
@@ -822,7 +884,6 @@
                 spread: 75,
                 origin: { y: 0.6 }
             });
-            // Tự động phát nhạc khi mở thiệp
             bgMusic.play().then(() => {
                 isPlaying = true;
                 musicBtn.classList.add('is-playing');
@@ -845,7 +906,6 @@
             isPlaying = !isPlaying;
         }
 
-        // Hiệu ứng sao bay khi chạm màn hình
         function spawnStar(e) {
             const star = document.createElement('div');
             star.className = 'touch-star';
@@ -857,7 +917,6 @@
             setTimeout(() => star.remove(), 1000);
         }
 
-        // Xử lý xác nhận tham dự
         function setRsvp(status) {
             const btnYes = document.getElementById('rsvpYes');
             const btnNo = document.getElementById('rsvpNo');
@@ -871,7 +930,6 @@
             }
         }
 
-        // Thả tim nhanh
         let hearts = 12;
         let caps = 8;
         function addReact(type) {
@@ -884,7 +942,6 @@
             }
         }
 
-        // Gửi lời chúc hiện ngay lên bảng tin
         function sendWish() {
             const input = document.getElementById('guestWish');
             const feed = document.getElementById('wishFeed');
@@ -898,7 +955,6 @@
             }
         }
 
-        // Đồng hồ đếm ngược
         const eventDate = new Date("Nov 22, 2026 09:30:00").getTime();
         setInterval(function() {
             const now = new Date().getTime();
