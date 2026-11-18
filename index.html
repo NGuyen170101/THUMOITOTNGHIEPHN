@@ -29,7 +29,7 @@
         .card-container {
             width: 100%;
             max-width: 420px;
-            min-height: 680px;
+            min-height: 720px;
             perspective: 1500px;
             position: relative;
         }
@@ -40,7 +40,7 @@
             background: #fffdf9;
             border-radius: 16px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            padding: 24px 20px;
+            padding: 22px 18px;
             text-align: center;
             border: 2px solid #d4af37;
             position: relative;
@@ -59,33 +59,53 @@
             pointer-events: none;
         }
 
-        .header-subtitle {
-            font-size: 11px;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            color: #b48a28;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
         .main-title {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 26px;
+            font-size: 23px;
             color: #1e3a5f;
             font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        /* Ô điền tên khách mời */
+        .guest-box {
+            margin-bottom: 10px;
+        }
+
+        .guest-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .guest-name-input {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #b48a28;
+            background: #fff8eb;
+            border: 1px dashed #d4af37;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-align: center;
+            width: 80%;
+            margin: 0 auto;
+            outline: none;
         }
 
         /* Khung ảnh tỷ lệ 3:4 cho ảnh tách nền */
         .photo-frame-34 {
-            width: 130px;
-            height: 173px; /* Tỷ lệ 3:4 */
-            margin: 0 auto 12px;
-            border-radius: 12px;
-            padding: 4px;
+            width: 110px;
+            height: 147px;
+            margin: 0 auto 8px;
+            border-radius: 10px;
+            padding: 3px;
             background: linear-gradient(45deg, #d4af37, #f3e5ab, #b48a28);
-            box-shadow: 0 8px 20px rgba(30, 58, 95, 0.2);
+            box-shadow: 0 6px 15px rgba(30, 58, 95, 0.2);
             overflow: hidden;
         }
 
@@ -94,51 +114,61 @@
             height: 100%;
             object-fit: cover;
             object-position: top center;
-            border-radius: 9px;
+            border-radius: 7px;
             background-color: #f1f5f9;
         }
 
         .graduate-name {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: #1e3a5f;
             margin-bottom: 2px;
         }
 
         .graduate-major {
-            font-size: 12px;
+            font-size: 11px;
             color: #64748b;
             font-weight: 500;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+        }
+
+        /* Lời cảm ơn */
+        .thank-you-text {
+            font-size: 11.5px;
+            line-height: 1.5;
+            color: #334155;
+            margin-bottom: 10px;
+            font-style: italic;
+            padding: 0 4px;
         }
 
         /* Đồng hồ đếm ngược */
         .countdown-container {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 14px;
+            gap: 6px;
+            margin-bottom: 10px;
         }
 
         .countdown-box {
             background: #1e3a5f;
             color: #fff;
-            padding: 6px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
-            min-width: 50px;
+            min-width: 45px;
             text-align: center;
         }
 
         .countdown-number {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: #d4af37;
             display: block;
         }
 
         .countdown-label {
-            font-size: 9px;
+            font-size: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #cbd5e1;
@@ -149,17 +179,17 @@
             background: #f8fafc;
             border-left: 3px solid #d4af37;
             border-right: 3px solid #d4af37;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-radius: 6px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             text-align: left;
-            font-size: 12px;
+            font-size: 11.5px;
         }
 
         .detail-item {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             line-height: 1.3;
         }
 
@@ -168,32 +198,32 @@
         }
 
         .detail-icon {
-            margin-right: 8px;
-            font-size: 14px;
+            margin-right: 6px;
+            font-size: 13px;
         }
 
         .detail-label {
             font-weight: 600;
             color: #1e3a5f;
             display: block;
-            font-size: 11px;
+            font-size: 10.5px;
         }
 
         /* Phần gửi lời chúc */
         .wish-section {
             background: #fff;
             border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 12px;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 10px;
             text-align: left;
         }
 
         .wish-title {
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 600;
             color: #1e3a5f;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
             gap: 4px;
@@ -206,10 +236,10 @@
 
         .wish-input {
             flex: 1;
-            padding: 6px 10px;
+            padding: 5px 8px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
-            font-size: 11.5px;
+            font-size: 11px;
             font-family: 'Montserrat', sans-serif;
             outline: none;
         }
@@ -222,17 +252,17 @@
             background: #d4af37;
             color: #0f1e36;
             border: none;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 11.5px;
+            font-size: 11px;
             cursor: pointer;
         }
 
         .wish-success {
-            font-size: 11px;
+            font-size: 10.5px;
             color: #16a34a;
-            margin-top: 4px;
+            margin-top: 3px;
             display: none;
             font-weight: 500;
         }
@@ -245,9 +275,9 @@
         }
 
         .btn {
-            padding: 9px 14px;
+            padding: 8px 12px;
             border-radius: 25px;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 600;
             text-decoration: none;
             cursor: pointer;
@@ -380,8 +410,14 @@
         <!-- NỘI DUNG BÊN TRONG -->
         <div class="card-inside">
             <div>
-                <div class="header-subtitle">Graduation Ceremony</div>
-                <h2 class="main-title">Thư Mời Tham Dự</h2>
+                <!-- Tiêu đề theo yêu cầu -->
+                <h2 class="main-title">Thư Mời Tham Dự Lễ Tốt Nghiệp</h2>
+
+                <!-- Phần Thân Mời (Có thể click vào ô để đổi tên khách mời trực tiếp) -->
+                <div class="guest-box">
+                    <div class="guest-label">Thân mời</div>
+                    <input type="text" class="guest-name-input" value="Bạn Thân Mến">
+                </div>
 
                 <!-- Ảnh tỷ lệ 3:4 (portrait.jpg) -->
                 <div class="photo-frame-34">
@@ -390,6 +426,11 @@
 
                 <div class="graduate-name">Nguyễn Hoàng Nam</div>
                 <div class="graduate-major">Tân Cử Nhân Ngành Công Nghệ Thông Tin</div>
+
+                <!-- Lời cảm ơn và chia sẻ -->
+                <p class="thank-you-text">
+                    "Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"
+                </p>
 
                 <!-- Đồng hồ đếm ngược -->
                 <div class="countdown-container">
@@ -412,7 +453,7 @@
                         <span class="detail-icon">📍</span>
                         <div>
                             <span class="detail-label">Địa điểm</span>
-                            Hội trường A, Trường Đại học Bách Khoa — 268 Lý Thường Kiệt, Q.10
+                            Hội trường A, Đại học Bách Khoa — 268 Lý Thường Kiệt, Q.10
                         </div>
                     </div>
                 </div>
@@ -421,10 +462,10 @@
                 <div class="wish-section">
                     <div class="wish-title">✍️ Gửi lời chúc mừng đến Tân Cử Nhân</div>
                     <div class="wish-input-group">
-                        <input type="text" id="guestWish" class="wish-input" placeholder="Nhập tên và lời chúc của bạn...">
+                        <input type="text" id="guestWish" class="wish-input" placeholder="Nhập lời chúc của bạn...">
                         <button class="btn-wish" onclick="sendWish()">Gửi</button>
                     </div>
-                    <div id="wishSuccess" class="wish-success">Cảm ơn bạn! Lời chúc đã được ghi nhận. 🎉</div>
+                    <div id="wishSuccess" class="wish-success">Cảm ơn bạn! Lời chúc đã được gửi đi. 🎉</div>
                 </div>
             </div>
 
@@ -445,7 +486,6 @@
         function openCard() {
             document.getElementById('invitationCard').classList.add('is-open');
             
-            // Kích hoạt pháo giấy chúc mừng
             confetti({
                 particleCount: 100,
                 spread: 70,
@@ -468,7 +508,7 @@
             }
         }
 
-        // Cài đặt ngày diễn ra sự kiện để đếm ngược (Ví dụ: 22/11/2026 09:30:00)
+        // Đồng hồ đếm ngược
         const eventDate = new Date("Nov 22, 2026 09:30:00").getTime();
 
         const timer = setInterval(function() {
