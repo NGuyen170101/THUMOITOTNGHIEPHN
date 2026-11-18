@@ -277,7 +277,7 @@
             padding: 0 4px;
         }
 
-        /* XẤP ẢNH POLAROID NGHỆ THUẬT */
+        /* XẤP ẢNH POLAROID */
         .polaroid-deck-wrapper {
             margin: 4px 0 8px 0;
             text-align: center;
@@ -574,7 +574,7 @@
         }
 
         /* ---------------------------------------------------- */
-        /* TRANG BÌA THIỆP PHONG CÁCH HIỆN ĐẠI (GLASSMORPHISM) */
+        /* TRANG BÌA THIỆP PHONG CÁCH HIỆN ĐẠI (ĐÃ ĐƯA NÚT MỞ LÊN CAO HƠN & THUẦN VIỆT) */
         /* ---------------------------------------------------- */
         .card-cover {
             position: absolute;
@@ -590,17 +590,16 @@
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease 0.35s;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             text-align: center;
-            padding: 36px 24px;
+            padding: 40px 24px;
             cursor: pointer;
             color: #fff;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Hiệu ứng ánh sáng bóng kính mờ (Glass highlight) */
         .card-cover::before {
             content: "";
             position: absolute;
@@ -620,6 +619,7 @@
 
         .cover-top {
             z-index: 2;
+            margin-bottom: 24px;
         }
 
         .cover-badge {
@@ -657,6 +657,7 @@
 
         .cover-center {
             z-index: 2;
+            margin-bottom: 30px;
         }
 
         .cover-icon-box {
@@ -676,6 +677,8 @@
         .cover-bottom {
             z-index: 2;
             width: 100%;
+            margin-top: auto; /* Đẩy nút lên vị trí dễ thấy, không bị quá sâu */
+            margin-bottom: 20px;
         }
 
         .modern-open-btn {
@@ -705,12 +708,12 @@
 
     <div class="card-container" id="invitationCard">
         
-        <!-- BÌA THIỆP PHONG CÁCH HIỆN ĐẠI (GLASSMORPHISM) -->
+        <!-- BÌA THIỆP HIỆN ĐẠI THUẦN VIỆT -->
         <div class="card-cover" onclick="openCard()">
             <div class="cover-top">
-                <div class="cover-badge">Invitation</div>
+                <div class="cover-badge">Thư Mời</div>
                 <h1 class="cover-main-title">Lễ Tốt Nghiệp</h1>
-                <div class="cover-sub-title">Class of 2026</div>
+                <div class="cover-sub-title">Khóa 2026</div>
             </div>
 
             <div class="cover-center">
@@ -741,7 +744,7 @@
                         </div>
                     </div>
 
-                    <!-- Ảnh tân cử nhân nén trái -->
+                    <!-- Ảnh tân cử nhân nép trái -->
                     <div class="cinematic-hero">
                         <div class="cinematic-photo">
                             <img src="portrait.jpg" alt="Ảnh Tân Cử Nhân">
