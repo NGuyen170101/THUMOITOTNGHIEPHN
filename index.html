@@ -29,7 +29,7 @@
         .card-container {
             width: 100%;
             max-width: 420px;
-            min-height: 720px;
+            min-height: 730px;
             perspective: 1500px;
             position: relative;
         }
@@ -37,125 +37,211 @@
         /* TRANG BÊN TRONG THIỆP */
         .card-inside {
             width: 100%;
-            background: #fffdf9;
-            border-radius: 16px;
+            background: #ffffff;
+            border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            padding: 22px 18px;
+            padding: 24px 20px;
             text-align: center;
-            border: 2px solid #d4af37;
             position: relative;
             z-index: 1;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            overflow: hidden;
         }
 
-        .card-inside::before {
-            content: "";
-            position: absolute;
-            top: 8px; left: 8px; right: 8px; bottom: 8px;
-            border: 1px dashed rgba(212, 175, 55, 0.5);
-            border-radius: 10px;
-            pointer-events: none;
+        /* Hiệu ứng xuất hiện khi mở bìa */
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
+
+        .card-container.is-open .reveal-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-container.is-open .delay-1 { transition-delay: 0.25s; }
+        .card-container.is-open .delay-2 { transition-delay: 0.4s; }
+        .card-container.is-open .delay-3 { transition-delay: 0.55s; }
+        .card-container.is-open .delay-4 { transition-delay: 0.7s; }
 
         .main-title {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 23px;
-            color: #1e3a5f;
+            font-size: 21px;
+            color: #1e293b;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         /* Ô điền tên khách mời */
         .guest-box {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .guest-label {
-            font-size: 11px;
-            color: #64748b;
+            font-size: 10px;
+            color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             margin-bottom: 2px;
         }
 
         .guest-name-input {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 700;
-            color: #b48a28;
-            background: #fff8eb;
-            border: 1px dashed #d4af37;
-            padding: 4px 10px;
-            border-radius: 6px;
+            color: #0f172a;
+            background: #f8fafc;
+            border: none;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 2px 8px;
+            border-radius: 4px;
             text-align: center;
-            width: 80%;
+            width: 75%;
             margin: 0 auto;
             outline: none;
         }
 
-        /* Khung ảnh tỷ lệ 3:4 cho ảnh tách nền */
-        .photo-frame-34 {
-            width: 110px;
-            height: 147px;
-            margin: 0 auto 8px;
-            border-radius: 10px;
-            padding: 3px;
-            background: linear-gradient(45deg, #d4af37, #f3e5ab, #b48a28);
-            box-shadow: 0 6px 15px rgba(30, 58, 95, 0.2);
+        .guest-name-input:focus {
+            border-bottom-color: #0f172a;
+        }
+
+        /* KHU VỰC ẢNH PHONG CÁCH ĐIỆN ẢNH NÉP TRÁI & BLUR VỀ GIỮA */
+        .cinematic-hero {
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-height: 175px;
+            margin: 0 -20px 10px -20px; /* Tràn sát mép trái thẻ */
+            padding-right: 20px;
+            text-align: right;
             overflow: hidden;
         }
 
-        .photo-frame-34 img {
+        .cinematic-photo {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 140px;
+            height: 186px; /* Tỷ lệ 3:4 */
+            z-index: 1;
+            /* Tạo hiệu ứng mờ dần (fade) sang phải và xuống dưới hòa vào nền */
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%),
+                                linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
+            -webkit-mask-composite: source-in;
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%),
+                        linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
+            mask-composite: intersect;
+            opacity: 0;
+            transform: translateX(-25px) scale(1.03);
+            filter: blur(4px);
+            transition: all 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
+        }
+
+        .card-container.is-open .cinematic-photo {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            filter: blur(0);
+        }
+
+        .cinematic-photo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             object-position: top center;
-            border-radius: 7px;
-            background-color: #f1f5f9;
+        }
+
+        /* Lớp phủ sương mờ nhẹ ở vùng giao thoa giữa ảnh và chữ */
+        .cinematic-blur-overlay {
+            position: absolute;
+            left: 85px;
+            top: 0;
+            width: 65px;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 70%, rgba(255,255,255,1) 100%);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .cinematic-info {
+            position: relative;
+            z-index: 3;
+            margin-left: auto;
+            width: 66%;
+            padding-left: 10px;
+            text-align: right;
+        }
+
+        .graduate-badge {
+            display: inline-block;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            font-weight: 600;
         }
 
         .graduate-name {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
-            color: #1e3a5f;
-            margin-bottom: 2px;
+            color: #0f172a;
+            line-height: 1.15;
+            margin-bottom: 4px;
         }
 
         .graduate-major {
             font-size: 11px;
-            color: #64748b;
+            color: #475569;
             font-weight: 500;
-            margin-bottom: 8px;
+            line-height: 1.35;
         }
 
         /* Lời cảm ơn */
         .thank-you-text {
-            font-size: 11.5px;
+            font-size: 11px;
             line-height: 1.5;
-            color: #334155;
+            color: #475569;
             margin-bottom: 10px;
             font-style: italic;
             padding: 0 4px;
         }
 
-        /* Đồng hồ đếm ngược */
+        /* Đồng hồ đếm ngược + dòng chữ nhỏ "Hẹn gặp sau:" */
+        .countdown-wrapper {
+            margin-bottom: 10px;
+        }
+
+        .countdown-caption {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
         .countdown-container {
             display: flex;
             justify-content: center;
             gap: 6px;
-            margin-bottom: 10px;
         }
 
         .countdown-box {
-            background: #1e3a5f;
-            color: #fff;
-            padding: 4px 8px;
-            border-radius: 6px;
+            background: #f1f5f9;
+            color: #1e293b;
+            padding: 5px 8px;
+            border-radius: 8px;
             min-width: 45px;
             text-align: center;
         }
@@ -163,7 +249,7 @@
         .countdown-number {
             font-size: 14px;
             font-weight: 700;
-            color: #d4af37;
+            color: #0f172a;
             display: block;
         }
 
@@ -171,19 +257,17 @@
             font-size: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #cbd5e1;
+            color: #64748b;
         }
 
         /* Khối thông tin */
         .details-box {
             background: #f8fafc;
-            border-left: 3px solid #d4af37;
-            border-right: 3px solid #d4af37;
-            padding: 8px 10px;
-            border-radius: 6px;
+            padding: 10px 12px;
+            border-radius: 10px;
             margin-bottom: 10px;
             text-align: left;
-            font-size: 11.5px;
+            font-size: 11px;
         }
 
         .detail-item {
@@ -204,25 +288,24 @@
 
         .detail-label {
             font-weight: 600;
-            color: #1e3a5f;
+            color: #334155;
             display: block;
-            font-size: 10.5px;
+            font-size: 10px;
         }
 
         /* Phần gửi lời chúc */
         .wish-section {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
+            background: #f8fafc;
+            border-radius: 10px;
             padding: 8px 10px;
             margin-bottom: 10px;
             text-align: left;
         }
 
         .wish-title {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
-            color: #1e3a5f;
+            color: #334155;
             margin-bottom: 4px;
             display: flex;
             align-items: center;
@@ -237,7 +320,8 @@
         .wish-input {
             flex: 1;
             padding: 5px 8px;
-            border: 1px solid #cbd5e1;
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
             font-size: 11px;
             font-family: 'Montserrat', sans-serif;
@@ -245,14 +329,14 @@
         }
 
         .wish-input:focus {
-            border-color: #1e3a5f;
+            border-color: #0f172a;
         }
 
         .btn-wish {
-            background: #d4af37;
-            color: #0f1e36;
+            background: #0f172a;
+            color: #fff;
             border: none;
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 11px;
@@ -260,14 +344,14 @@
         }
 
         .wish-success {
-            font-size: 10.5px;
+            font-size: 10px;
             color: #16a34a;
             margin-top: 3px;
             display: none;
             font-weight: 500;
         }
 
-        /* Nút bấm bản đồ */
+        /* Nút bấm hiện đại */
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -275,14 +359,14 @@
         }
 
         .btn {
-            padding: 8px 12px;
-            border-radius: 25px;
+            padding: 8px 14px;
+            border-radius: 20px;
             font-size: 11.5px;
             font-weight: 600;
             text-decoration: none;
             cursor: pointer;
             border: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -290,29 +374,26 @@
         }
 
         .btn-map {
-            background: #1e3a5f;
+            background: #0f172a;
             color: #fff;
             flex: 2;
-            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
         }
 
         .btn-close {
             background: #f1f5f9;
             color: #475569;
             flex: 1;
-            border: 1px solid #cbd5e1;
         }
 
-        /* TRANG BÌA THIỆP */
+        /* TRANG BÌA THIỆP TỐI GIẢN */
         .card-cover {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(145deg, #162b49 0%, #0f1e36 100%);
-            border-radius: 16px;
-            border: 2px solid #d4af37;
+            background: #0f172a;
+            border-radius: 20px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
             z-index: 10;
             transform-origin: left center;
@@ -327,15 +408,6 @@
             color: #fff;
         }
 
-        .card-cover::before {
-            content: "";
-            position: absolute;
-            top: 12px; left: 12px; right: 12px; bottom: 12px;
-            border: 1.5px solid rgba(212, 175, 55, 0.6);
-            border-radius: 10px;
-            pointer-events: none;
-        }
-
         .card-container.is-open .card-cover {
             transform: rotateY(-140deg);
             opacity: 0;
@@ -343,54 +415,52 @@
         }
 
         .cap-icon {
-            font-size: 56px;
-            margin-bottom: 16px;
-            filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.4));
+            font-size: 48px;
+            margin-bottom: 12px;
         }
 
         .cover-tag {
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 3px;
             text-transform: uppercase;
-            color: #f3e5ab;
-            margin-bottom: 12px;
+            color: #94a3b8;
+            margin-bottom: 10px;
         }
 
         .cover-title {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 38px;
+            font-size: 36px;
             font-weight: 700;
-            color: #d4af37;
+            color: #ffffff;
             line-height: 1.2;
-            margin-bottom: 12px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
         }
 
         .cover-year {
-            font-size: 16px;
+            font-size: 13px;
             letter-spacing: 4px;
-            color: #cbd5e1;
-            margin-bottom: 40px;
-            font-weight: 300;
+            color: #64748b;
+            margin-bottom: 36px;
+            font-weight: 400;
         }
 
         .open-trigger {
-            background: linear-gradient(45deg, #d4af37, #f3e5ab);
-            color: #0f1e36;
-            padding: 12px 28px;
-            border-radius: 30px;
+            background: #ffffff;
+            color: #0f172a;
+            padding: 10px 24px;
+            border-radius: 25px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             letter-spacing: 1px;
             text-transform: uppercase;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
         }
     </style>
 </head>
@@ -403,45 +473,52 @@
             <div class="cap-icon">🎓</div>
             <div class="cover-tag">Trân trọng kính mời</div>
             <h1 class="cover-title">Lễ Tốt Nghiệp</h1>
-            <div class="cover-year">— CLASS OF 2026 —</div>
+            <div class="cover-year">— 2026 —</div>
             <div class="open-trigger">Chạm để mở thiệp</div>
         </div>
 
         <!-- NỘI DUNG BÊN TRONG -->
         <div class="card-inside">
             <div>
-                <!-- Tiêu đề theo yêu cầu -->
-                <h2 class="main-title">Thư Mời Tham Dự Lễ Tốt Nghiệp</h2>
+                <div class="reveal-item delay-1">
+                    <h2 class="main-title">Thư Mời Tham Dự Lễ Tốt Nghiệp</h2>
 
-                <!-- Phần Thân Mời (Có thể click vào ô để đổi tên khách mời trực tiếp) -->
-                <div class="guest-box">
-                    <div class="guest-label">Thân mời</div>
-                    <input type="text" class="guest-name-input" value="Bạn Thân Mến">
+                    <div class="guest-box">
+                        <div class="guest-label">Thân mời</div>
+                        <input type="text" class="guest-name-input" value="Bạn Thân Mến">
+                    </div>
                 </div>
 
-                <!-- Ảnh tỷ lệ 3:4 (portrait.jpg) -->
-                <div class="photo-frame-34">
-                    <img src="portrait.jpg" alt="Ảnh Tân Cử Nhân">
+                <!-- Bố cục điện ảnh: Ảnh 3:4 nép trái + blur mờ về giữa -->
+                <div class="cinematic-hero">
+                    <div class="cinematic-photo">
+                        <img src="portrait.jpg" alt="Ảnh Tân Cử Nhân">
+                    </div>
+                    <div class="cinematic-blur-overlay"></div>
+                    <div class="cinematic-info reveal-item delay-2">
+                        <span class="graduate-badge">Tân Cử Nhân</span>
+                        <div class="graduate-name">Nguyễn Hoàng Nam</div>
+                        <div class="graduate-major">Chuyên ngành Công Nghệ Thông Tin</div>
+                    </div>
                 </div>
 
-                <div class="graduate-name">Nguyễn Hoàng Nam</div>
-                <div class="graduate-major">Tân Cử Nhân Ngành Công Nghệ Thông Tin</div>
-
-                <!-- Lời cảm ơn và chia sẻ -->
-                <p class="thank-you-text">
+                <p class="thank-you-text reveal-item delay-2">
                     "Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"
                 </p>
 
-                <!-- Đồng hồ đếm ngược -->
-                <div class="countdown-container">
-                    <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Ngày</span></div>
-                    <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Giờ</span></div>
-                    <div class="countdown-box"><span class="countdown-number" id="mins">00</span><span class="countdown-label">Phút</span></div>
-                    <div class="countdown-box"><span class="countdown-number" id="secs">00</span><span class="countdown-label">Giây</span></div>
+                <!-- Đồng hồ đếm ngược có dòng chữ "Hẹn gặp sau:" -->
+                <div class="countdown-wrapper reveal-item delay-3">
+                    <div class="countdown-caption">Hẹn gặp sau:</div>
+                    <div class="countdown-container">
+                        <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Ngày</span></div>
+                        <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Giờ</span></div>
+                        <div class="countdown-box"><span class="countdown-number" id="mins">00</span><span class="countdown-label">Phút</span></div>
+                        <div class="countdown-box"><span class="countdown-number" id="secs">00</span><span class="countdown-label">Giây</span></div>
+                    </div>
                 </div>
 
                 <!-- Thông tin chi tiết -->
-                <div class="details-box">
+                <div class="details-box reveal-item delay-3">
                     <div class="detail-item">
                         <span class="detail-icon">⏰</span>
                         <div>
@@ -459,7 +536,7 @@
                 </div>
 
                 <!-- Ô Gửi Lời Chúc -->
-                <div class="wish-section">
+                <div class="wish-section reveal-item delay-4">
                     <div class="wish-title">✍️ Gửi lời chúc mừng đến Tân Cử Nhân</div>
                     <div class="wish-input-group">
                         <input type="text" id="guestWish" class="wish-input" placeholder="Nhập lời chúc của bạn...">
@@ -469,7 +546,7 @@
                 </div>
             </div>
 
-            <div class="action-buttons">
+            <div class="action-buttons reveal-item delay-4">
                 <a href="https://maps.google.com/?q=268+Ly+Thuong+Kiet,+Quan+10,+Ho+Chi+Minh" target="_blank" class="btn btn-map">
                     🗺️ Xem bản đồ
                 </a>
@@ -482,10 +559,8 @@
     </div>
 
     <script>
-        // Hiệu ứng pháo giấy & mở thiệp
         function openCard() {
             document.getElementById('invitationCard').classList.add('is-open');
-            
             confetti({
                 particleCount: 100,
                 spread: 70,
@@ -497,7 +572,6 @@
             document.getElementById('invitationCard').classList.remove('is-open');
         }
 
-        // Xử lý gửi lời chúc
         function sendWish() {
             const input = document.getElementById('guestWish');
             const success = document.getElementById('wishSuccess');
@@ -508,7 +582,6 @@
             }
         }
 
-        // Đồng hồ đếm ngược
         const eventDate = new Date("Nov 22, 2026 09:30:00").getTime();
 
         const timer = setInterval(function() {
