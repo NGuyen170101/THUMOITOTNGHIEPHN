@@ -574,7 +574,7 @@
         }
 
         /* ---------------------------------------------------- */
-        /* TRANG BÌA THIỆP PHONG CÁCH HIỆN ĐẠI (ĐÃ ĐƯA NÚT MỞ LÊN CAO HƠN & THUẦN VIỆT) */
+        /* TRANG BÌA THIỆP HIỆN ĐẠI (ĐÃ CÂN ĐỐI LẠI KHOẢNG CÁCH, CHỐNG KHUẤT MẤT CHỮ) */
         /* ---------------------------------------------------- */
         .card-cover {
             position: absolute;
@@ -590,10 +590,10 @@
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease 0.35s;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center; /* Căn giữa hoàn toàn theo chiều dọc để các khối không bị dồn ép hay khuất chữ */
             align-items: center;
             text-align: center;
-            padding: 40px 24px;
+            padding: 30px 20px;
             cursor: pointer;
             color: #fff;
             overflow: hidden;
@@ -617,9 +617,13 @@
             pointer-events: none;
         }
 
-        .cover-top {
+        .cover-content-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px; /* Khoảng cách đều giữa các phần: Nhãn - Tiêu đề - Biểu tượng - Nút bấm */
+            width: 100%;
             z-index: 2;
-            margin-bottom: 24px;
         }
 
         .cover-badge {
@@ -632,63 +636,48 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 4px 12px;
             border-radius: 20px;
-            margin-bottom: 16px;
         }
 
         .cover-main-title {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 800;
             letter-spacing: 1px;
-            line-height: 1.15;
+            line-height: 1.2;
             text-transform: uppercase;
             background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
         }
 
         .cover-sub-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             letter-spacing: 4px;
             color: #cbd5e1;
             text-transform: uppercase;
         }
 
-        .cover-center {
-            z-index: 2;
-            margin-bottom: 30px;
-        }
-
         .cover-icon-box {
-            width: 64px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            margin: 0 auto;
+            font-size: 24px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
-        .cover-bottom {
-            z-index: 2;
-            width: 100%;
-            margin-top: auto; /* Đẩy nút lên vị trí dễ thấy, không bị quá sâu */
-            margin-bottom: 20px;
-        }
-
         .modern-open-btn {
-            width: 100%;
+            width: 85%;
             background: #ffffff;
             color: #0f172a;
-            padding: 13px;
+            padding: 12px;
             border-radius: 30px;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11.5px;
             letter-spacing: 1.5px;
             text-transform: uppercase;
             box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
@@ -708,19 +697,15 @@
 
     <div class="card-container" id="invitationCard">
         
-        <!-- BÌA THIỆP HIỆN ĐẠI THUẦN VIỆT -->
+        <!-- BÌA THIỆP ĐÃ CÂN ĐỐI BỐ CỤC, THUẦN VIỆT -->
         <div class="card-cover" onclick="openCard()">
-            <div class="cover-top">
+            <div class="cover-content-box">
                 <div class="cover-badge">Thư Mời</div>
-                <h1 class="cover-main-title">Lễ Tốt Nghiệp</h1>
-                <div class="cover-sub-title">Khóa 2026</div>
-            </div>
-
-            <div class="cover-center">
+                <div>
+                    <h1 class="cover-main-title">Lễ Tốt Nghiệp</h1>
+                    <div class="cover-sub-title" style="margin-top: 4px;">Khóa 2026</div>
+                </div>
                 <div class="cover-icon-box">🎓</div>
-            </div>
-
-            <div class="cover-bottom">
                 <div class="modern-open-btn">Chạm để mở thiệp</div>
             </div>
         </div>
