@@ -37,7 +37,7 @@
         .card-inside {
             width: 100%;
             min-height: 820px;
-            border-radius: 22px;
+            border-radius: 24px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.55);
             padding: 22px 18px;
             text-align: center;
@@ -187,7 +187,7 @@
             outline: none;
         }
 
-        /* ẢNH TÂN CỬ NHÂN TĂNG TỶ LỆ */
+        /* ẢNH TÂN CỬ NHÂN NÉP TRÁI */
         .cinematic-hero {
             position: relative;
             display: flex;
@@ -277,9 +277,7 @@
             padding: 0 4px;
         }
 
-        /* ---------------------------------------------------- */
-        /* Ý TƯỞNG 2: XẤP ẢNH NGHỆ THUẬT THẢ RƠI (POLAROID DECK) */
-        /* ---------------------------------------------------- */
+        /* XẤP ẢNH POLAROID NGHỆ THUẬT */
         .polaroid-deck-wrapper {
             margin: 4px 0 8px 0;
             text-align: center;
@@ -330,12 +328,10 @@
             font-weight: 600;
         }
 
-        /* Hiệu ứng phân tầng các tấm ảnh trong xấp */
         .polaroid-card:nth-child(1) { transform: rotate(-4deg) translateY(4px); z-index: 3; }
         .polaroid-card:nth-child(2) { transform: rotate(3deg) translateY(2px); z-index: 2; }
         .polaroid-card:nth-child(3) { transform: rotate(-2deg) translateY(0px); z-index: 1; }
 
-        /* Trạng thái khi ảnh trên cùng bị hất bay ra khi chạm */
         .polaroid-card.fly-away {
             transform: translateX(140px) translateY(-50px) rotate(35deg) scale(0.9);
             opacity: 0;
@@ -577,28 +573,43 @@
             100% { transform: translate(-50%, -60px) scale(1.3); opacity: 0; }
         }
 
-        /* TRANG BÌA THIỆP */
+        /* ---------------------------------------------------- */
+        /* TRANG BÌA THIỆP PHONG CÁCH HIỆN ĐẠI (GLASSMORPHISM) */
+        /* ---------------------------------------------------- */
         .card-cover {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(155deg, #131c31 0%, #090e1a 100%);
-            border-radius: 22px;
-            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.65);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
             z-index: 10;
             transform-origin: left center;
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease 0.35s;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             text-align: center;
-            padding: 30px;
+            padding: 36px 24px;
             cursor: pointer;
             color: #fff;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Hiệu ứng ánh sáng bóng kính mờ (Glass highlight) */
+        .card-cover::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+            pointer-events: none;
         }
 
         .card-container.is-open .card-cover {
@@ -607,52 +618,82 @@
             pointer-events: none;
         }
 
-        .cap-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
+        .cover-top {
+            z-index: 2;
         }
 
-        .cover-tag {
-            font-size: 10.5px;
+        .cover-badge {
+            display: inline-block;
+            font-size: 9px;
             letter-spacing: 3px;
             text-transform: uppercase;
             color: #94a3b8;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .cover-main-title {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.15;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
         }
 
-        .cover-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: #fff;
-            line-height: 1.25;
-            margin-bottom: 6px;
+        .cover-sub-title {
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 4px;
+            color: #cbd5e1;
             text-transform: uppercase;
         }
 
-        .cover-year {
-            font-size: 12px;
-            letter-spacing: 5px;
-            color: #64748b;
-            margin-bottom: 35px;
-            font-weight: 500;
+        .cover-center {
+            z-index: 2;
         }
 
-        .open-trigger {
+        .cover-icon-box {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .cover-bottom {
+            z-index: 2;
+            width: 100%;
+        }
+
+        .modern-open-btn {
+            width: 100%;
             background: #ffffff;
             color: #0f172a;
-            padding: 10px 24px;
+            padding: 13px;
             border-radius: 30px;
             font-weight: 700;
-            font-size: 11.5px;
-            letter-spacing: 1.2px;
+            font-size: 12px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            animation: pulse 2s infinite;
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .modern-open-btn:active {
+            transform: scale(0.97);
         }
     </style>
 </head>
@@ -664,13 +705,21 @@
 
     <div class="card-container" id="invitationCard">
         
-        <!-- BÌA THIỆP -->
+        <!-- BÌA THIỆP PHONG CÁCH HIỆN ĐẠI (GLASSMORPHISM) -->
         <div class="card-cover" onclick="openCard()">
-            <div class="cap-icon">🎓</div>
-            <div class="cover-tag">Trân trọng kính mời</div>
-            <h1 class="cover-title">Lễ Tốt Nghiệp</h1>
-            <div class="cover-year">— 2026 —</div>
-            <div class="open-trigger">Chạm để mở thiệp</div>
+            <div class="cover-top">
+                <div class="cover-badge">Invitation</div>
+                <h1 class="cover-main-title">Lễ Tốt Nghiệp</h1>
+                <div class="cover-sub-title">Class of 2026</div>
+            </div>
+
+            <div class="cover-center">
+                <div class="cover-icon-box">🎓</div>
+            </div>
+
+            <div class="cover-bottom">
+                <div class="modern-open-btn">Chạm để mở thiệp</div>
+            </div>
         </div>
 
         <!-- NỘI DUNG BÊN TRONG -->
@@ -692,7 +741,7 @@
                         </div>
                     </div>
 
-                    <!-- Ảnh tân cử nhân kích thước lớn, nép trái -->
+                    <!-- Ảnh tân cử nhân nén trái -->
                     <div class="cinematic-hero">
                         <div class="cinematic-photo">
                             <img src="portrait.jpg" alt="Ảnh Tân Cử Nhân">
@@ -708,21 +757,18 @@
                         "Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"
                     </p>
 
-                    <!-- XẤP ẢNH POLAROID NGHỆ THUẬT (Ý TƯỞNG 2) -->
+                    <!-- XẤP ẢNH POLAROID -->
                     <div class="polaroid-deck-wrapper text-reveal d-3" onclick="event.stopPropagation()">
                         <div class="polaroid-deck-title">📸 Khoảnh khắc thanh xuân</div>
                         <div class="polaroid-stack" id="polaroidStack" onclick="nextPolaroid()">
-                            <!-- Tấm 3 (Dưới cùng) -->
                             <div class="polaroid-card">
                                 <img src="portrait.jpg" alt="Kỷ niệm 3">
                                 <div class="polaroid-caption">Mùa tốt nghiệp 2026</div>
                             </div>
-                            <!-- Tấm 2 (Ở giữa) -->
                             <div class="polaroid-card">
                                 <img src="bg.jpg" alt="Kỷ niệm 2">
                                 <div class="polaroid-caption">Khuôn viên trường</div>
                             </div>
-                            <!-- Tấm 1 (Trên cùng) -->
                             <div class="polaroid-card" id="topCard">
                                 <img src="portrait.jpg" alt="Kỷ niệm 1">
                                 <div class="polaroid-caption">Ngày đầu nhập trường</div>
@@ -840,18 +886,16 @@
             setTimeout(() => star.remove(), 1000);
         }
 
-        // Hiệu ứng lật/hất ảnh Polaroid khi chạm vào xấp ảnh
         function nextPolaroid() {
             const stack = document.getElementById('polaroidStack');
             const cards = stack.getElementsByClassName('polaroid-card');
             if (cards.length > 0) {
-                const topCard = cards[cards.length - 1]; // Lấy tấm trên cùng
+                const topCard = cards[cards.length - 1];
                 topCard.classList.add('fly-away');
                 setTimeout(() => {
                     topCard.classList.remove('fly-away');
                     topCard.style.zIndex = -1;
-                    stack.prepend(topCard); // Đưa xuống dưới cùng của xấp
-                    // Reset lại z-index các tấm còn lại
+                    stack.prepend(topCard);
                     for (let i = 0; i < cards.length; i++) {
                         cards[i].style.zIndex = cards.length - i;
                     }
