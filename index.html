@@ -971,6 +971,13 @@
             document.getElementById("mins").innerText = mins < 10 ? "0" + mins : mins;
             document.getElementById("secs").innerText = secs < 10 ? "0" + secs : secs;
         }, 1000);
+        // Tự động đọc tên từ đường link (Ví dụ: ?to=Ten_Khach)
+const urlParams = new URLSearchParams(window.location.search);
+const guestName = urlParams.get('to');
+if (guestName) {
+    document.querySelector('.guest-name-input').value = guestName;
+}
+
     </script>
 
 </body>
