@@ -574,7 +574,7 @@
         }
 
         /* ---------------------------------------------------- */
-        /* TRANG BÌA THIỆP: BACKGROUND CÓ CHIỀU SÂU & LOGO TRÀN KHUNG */
+        /* TRANG BÌA THIỆP: TRÁNG GƯƠNG + POPUP CHẠM ĐỂ MỞ THIỆP */
         /* ---------------------------------------------------- */
         .card-cover {
             position: absolute;
@@ -604,19 +604,32 @@
             border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
-        /* Họa tiết lưới chấm/đường mảnh tinh tế trên nền bìa */
+        /* Vệt sáng tráng gương lướt qua mặt bìa */
         .card-cover::before {
             content: "";
             position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-            background-size: 28px 28px;
-            -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,0.85) 20%, rgba(0,0,0,0.1) 85%);
-            mask-image: radial-gradient(circle at center, rgba(0,0,0,0.85) 20%, rgba(0,0,0,0.1) 85%);
+            top: -20%;
+            left: -130%;
+            width: 75%;
+            height: 140%;
+            background: linear-gradient(
+                105deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.15) 35%,
+                rgba(255, 255, 255, 0.68) 50%,
+                rgba(255, 255, 255, 0.15) 65%,
+                transparent 100%
+            );
+            transform: skewX(-18deg);
+            animation: mirrorShine 3.6s ease-in-out infinite;
             pointer-events: none;
-            z-index: 0;
+            z-index: 5;
+        }
+
+        @keyframes mirrorShine {
+            0% { left: -130%; }
+            55% { left: 160%; }
+            100% { left: 160%; }
         }
 
         /* Vòng sáng trang trí phía sau logo */
@@ -687,7 +700,6 @@
             margin-top: 2px;
         }
 
-        /* Khung logo tràn đầy, không viền trắng thừa */
         .cover-logo-box {
             width: 104px;
             height: 104px;
@@ -709,6 +721,7 @@
             display: block;
         }
 
+        /* Animation popup nhấp nhô cho CHẠM ĐỂ MỞ THIỆP */
         .modern-open-btn {
             width: 82%;
             background: #0f172a;
@@ -720,7 +733,19 @@
             letter-spacing: 1.5px;
             text-transform: uppercase;
             box-shadow: 0 10px 25px rgba(15, 23, 42, 0.24);
+            animation: popupPulse 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
             transition: transform 0.2s, background 0.2s;
+        }
+
+        @keyframes popupPulse {
+            0%, 100% {
+                transform: scale(1) translateY(0);
+                box-shadow: 0 10px 25px rgba(15, 23, 42, 0.24);
+            }
+            50% {
+                transform: scale(1.05) translateY(-3px);
+                box-shadow: 0 15px 30px rgba(15, 23, 42, 0.34);
+            }
         }
 
         .modern-open-btn:active {
@@ -737,7 +762,7 @@
 
     <div class="card-container" id="invitationCard">
         
-        <!-- BÌA THIỆP CÓ BACKGROUND CHIỀU SÂU & LOGO TRÀN KHUNG -->
+        <!-- BÌA THIỆP CÓ TRÁNG GƯƠNG & POPUP CHẠM ĐỂ MỞ THIỆP -->
         <div class="card-cover" onclick="openCard()">
             <div class="cover-content-box">
                 <div class="cover-title-group">
