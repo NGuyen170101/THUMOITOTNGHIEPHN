@@ -39,10 +39,13 @@ button{cursor:pointer;border:0;background:none}
 .stage{width:420px;max-width:100%;position:relative}
 .card{width:420px;position:absolute;top:0;left:0;transform:scale(var(--s,1));transform-origin:top left;perspective:1600px}
 
+/* Chỉ bật chuyển động scale sau lần chạm đầu tiên (tránh thiệp bị 'nhảy' khi vừa tải trang) */
+.anim .card{transition:transform .8s var(--ease)}
+.anim .stage{transition:width .8s var(--ease)}
 .inside{
   position:relative;overflow:hidden;border-radius:24px;background:#f8fafc;
   box-shadow:0 25px 50px rgba(15,23,42,.18);padding:22px 18px 18px;text-align:center;
-  display:flex;flex-direction:column;gap:10px;min-height:760px;contain:paint;
+  display:flex;flex-direction:column;gap:10px;height:var(--cover-h,740px);transition:height 1s cubic-bezier(.4,0,.2,1);contain:paint;
 }
 /* Blur nền áp thẳng lên ảnh (rẻ hơn backdrop-filter phủ cả thiệp khi ảnh đang zoom) */
 .bg{position:absolute;inset:-6px;background:url('bg.jpg') center bottom/cover;filter:blur(2.5px);
@@ -103,6 +106,7 @@ button{cursor:pointer;border:0;background:none}
 .name{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:3px;white-space:nowrap}
 .major{font-size:11.5px;font-weight:600;color:#334155;line-height:1.35}
 
+.lead{margin-top:8px;font-size:13px;font-style:italic;font-weight:500;color:var(--muted)}
 .thanks{padding:10px 14px;font-size:12px;line-height:1.5;font-style:italic;font-weight:500;color:#334155}
 
 /* ===== POLAROID ===== */
@@ -156,7 +160,7 @@ button{cursor:pointer;border:0;background:none}
 
 /* ===== BÌA THIỆP ===== */
 .cover{
-  position:absolute;inset:0;z-index:10;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.8);
+  position:absolute;top:0;left:0;right:0;height:var(--cover-h,740px);z-index:10;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.8);
   display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px 20px;text-align:center;
   background:
     radial-gradient(circle at 18% 16%,rgba(56,189,248,.24),transparent 45%),
@@ -246,6 +250,7 @@ button{cursor:pointer;border:0;background:none}
         <div class="title">Lễ Tốt Nghiệp</div>
         <div class="guest-label">Thân mời</div>
         <input class="guest" id="guest" type="text" maxlength="40" aria-label="Tên khách mời">
+        <p class="lead">đến tham dự lễ tốt nghiệp của</p>
       </header>
 
       <div class="hero">
@@ -337,7 +342,8 @@ const CONFIG = {
   defaultGuest: 'Bạn Thân Mến',
   portrait: 'portrait.png',               // ẢNH CHÂN DUNG TÁCH NỀN (PNG trong suốt, 3:4, vd 660×880)
   music: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3',
-  wishEndpoint: '',                      // (tuỳ chọn) URL nhận lời chúc, ví dụ Formspree
+  wishEndpoint: '',                      // URL Web app của Google Apps Script (kết thúc bằng /exec) — để trống = không gửi về đâu cả
+  token: 'doi-chuoi-bi-mat-cua-ban',     // phải trùng TOKEN trong Apps Script
   photos: [                              // ảnh trong xấp polaroid
     { src: 'portrait.jpg', cap: 'Ngày đầu nhập trường' },
     { src: 'bg.jpg',       cap: 'Khuôn viên trường' },
@@ -358,12 +364,17 @@ const pad = n => String(n).padStart(2, '0');
 const startAt = new Date(CONFIG.start);
 
 /* ================= SCALE THEO BỀ NGANG ================= */
+const COVER_H = 740;    // chiều cao thiết kế của trang bìa (px, chưa scale)
+document.documentElement.style.setProperty('--cover-h', COVER_H + 'px');
+/* Đang đóng (trang bìa): scale ĐỀU để vừa cả bề ngang lẫn bề dọc màn hình → thấy trọn bìa.
+   Đã mở: chỉ scale theo bề ngang, nội dung dài thì cuộn dọc. */
 function fitScale() {
-  const avail = document.documentElement.clientWidth - 24;       // trừ lề body
-  const s = Math.min(MAX_SCALE, avail / DESIGN_W);
+  const w = document.documentElement.clientWidth - 24;            // trừ lề body
+  let s = Math.min(MAX_SCALE, w / DESIGN_W);
+  if (!card.classList.contains('open')) s = Math.min(s, (innerHeight - 24) / COVER_H);
   card.style.setProperty('--s', s);
   stage.style.width = DESIGN_W * s + 'px';
-  stage.style.height = card.offsetHeight * s + 'px';              // cao theo nội dung → trang tự cuộn
+  stage.style.height = card.offsetHeight * s + 'px';
 }
 addEventListener('resize', fitScale);
 if ('ResizeObserver' in window) new ResizeObserver(fitScale).observe(card);
@@ -396,7 +407,15 @@ fitScale();
 /* ================= TÊN KHÁCH (?khach=...) & ADMIN (?admin=1) ================= */
 const params = new URLSearchParams(location.search);
 const guestEl = $('guest');
-const guestName = (params.get('khach') || '').trim().slice(0, 40);
+/* Xưng hô: ?khach=Nghĩa → "Bạn Nghĩa". Tên đã có xưng hô ("Cô Lan") thì giữ nguyên.
+   Đổi xưng hô bằng &xh=Cô ; &xh= (rỗng) để hiện tên trơn. */
+const HONORIFIC = /^(anh|chị|cô|chú|bác|thầy|bạn|em|dì|cậu|mợ|ông|bà|gia đình)(\s|$)/i;
+const xh = params.has('xh') ? params.get('xh').trim().slice(0, 12) : 'Bạn';
+const fullName = raw => {
+  raw = raw.trim().slice(0, 40);
+  return !raw || !xh || HONORIFIC.test(raw) ? raw : `${xh} ${raw}`;
+};
+const guestName = fullName(params.get('khach') || '');
 guestEl.value = guestName || CONFIG.defaultGuest;
 if (params.get('admin') === '1') $('admin').style.display = 'block';
 
@@ -410,7 +429,7 @@ async function copy(text) {
     document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
   }
 }
-$('aName').addEventListener('input', e => guestEl.value = e.target.value.trim() || CONFIG.defaultGuest);
+$('aName').addEventListener('input', e => guestEl.value = fullName(e.target.value) || CONFIG.defaultGuest);
 $('aToggle').onclick = () => {
   const bulk = $('admin').classList.toggle('bulk');
   $('aToggle').textContent = bulk ? 'Tạo từng link' : 'Tạo hàng loạt';
@@ -428,6 +447,31 @@ $('aCopy').onclick = async () => {
   setTimeout(() => { btn.textContent = label; btn.classList.remove('ok'); }, 1800);
 };
 $('adminX').onclick = () => $('admin').style.display = 'none';
+
+/* ================= GỬI VỀ GOOGLE SHEET (riêng tư: chỉ chủ thiệp xem được) ================= */
+function send(data) {
+  if (!CONFIG.wishEndpoint) return;
+  const body = JSON.stringify({ token: CONFIG.token, guest: guestName || guestEl.value.trim() || '(không tên)', ...data });
+  try {
+    fetch(CONFIG.wishEndpoint, { method: 'POST', mode: 'no-cors', keepalive: true,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body }).catch(() => {});
+  } catch {}
+}
+/* Tim/mũ: gom lại, 2 giây sau lần bấm cuối mới gửi 1 dòng (khỏi spam Sheet) */
+const pend = { hearts: 0, caps: 0 };
+let pendTimer;
+function flushReacts() {
+  clearTimeout(pendTimer);
+  if (!pend.hearts && !pend.caps) return;
+  send({ kind: 'react', ...pend });
+  pend.hearts = pend.caps = 0;
+}
+function queueReact(type) {
+  pend[type === 'heart' ? 'hearts' : 'caps']++;
+  clearTimeout(pendTimer); pendTimer = setTimeout(flushReacts, 2000);
+}
+addEventListener('pagehide', flushReacts);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushReacts(); });
 
 /* ================= PHÁO GIẤY (chạy trong Web Worker → không giật UI) ================= */
 let fx = null;
@@ -452,14 +496,31 @@ function setMusic(on) {
   }
 }
 let settleTimer;
+let growTimer;
 function openCard() {
+  document.body.classList.add('anim');
+  const inside = $('inside');
+  clearTimeout(growTimer);
+  inside.style.height = Math.max(inside.scrollHeight, COVER_H) + 'px';   // trang trong giãn ra bằng nội dung
+  growTimer = setTimeout(() => inside.style.height = 'auto', 1100);
+  if (!store.get('opened', false)) { store.set('opened', true); send({ kind: 'open' }); }       // rồi trả về tự động
   card.classList.add('open');
+  fitScale();
   const f = getFx(); if (f) f({ particleCount: 110, spread: 75, origin: { y: .6 } });
   if (CONFIG.music) setMusic(true);
   clearTimeout(settleTimer);
   settleTimer = setTimeout(() => card.classList.add('settled'), 3000);   // nhả will-change sau khi animation xong
 }
-function closeCard() { card.classList.remove('open', 'settled'); }
+function closeCard() {
+  const inside = $('inside');
+  clearTimeout(growTimer);
+  inside.style.height = inside.offsetHeight + 'px';
+  void inside.offsetHeight;                                  // chốt chiều cao hiện tại để có chuyển động co lại
+  inside.style.height = COVER_H + 'px';
+  card.classList.remove('open', 'settled');
+  fitScale();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 $('cover').onclick = openCard;
 $('closeBtn').onclick = closeCard;
@@ -541,7 +602,7 @@ const counts = store.get('reacts', { heart: 0, cap: 0 });
 const showCounts = () => { $('heart').textContent = counts.heart; $('capn').textContent = counts.cap; };
 showCounts();
 document.querySelectorAll('[data-react]').forEach(b => b.onclick = () => {
-  counts[b.dataset.react]++; store.set('reacts', counts); showCounts();
+  counts[b.dataset.react]++; store.set('reacts', counts); showCounts(); queueReact(b.dataset.react);
   const f = getFx();
   if (f) {
     const r = b.getBoundingClientRect();
@@ -563,21 +624,14 @@ function renderWish(w) {
 }
 wishes.forEach(renderWish);
 
-$('wishForm').onsubmit = async e => {
+$('wishForm').onsubmit = e => {
   e.preventDefault();
   const text = $('wishInput').value.trim().slice(0, 140);
   if (!text) return;
   const w = { name: guestName || guestEl.value.trim() || 'Khách mời', text };
   wishes.push(w); store.set('wishes', wishes.slice(-30)); renderWish(w);
   $('wishInput').value = '';
-  if (CONFIG.wishEndpoint) {
-    try {
-      await fetch(CONFIG.wishEndpoint, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(w)
-      });
-    } catch {}
-  }
+  send({ kind: 'wish', text });
 };
 </script>
 </body>
