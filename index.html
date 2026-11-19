@@ -15,7 +15,7 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: radial-gradient(circle at top, #e2e8f0 0%, #cbd5e1 100%);
+            background: radial-gradient(circle at top, #cbd5e1 0%, #94a3b8 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -38,7 +38,7 @@
             width: 100%;
             min-height: 820px;
             border-radius: 24px;
-            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.15);
+            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.18);
             padding: 22px 18px;
             text-align: center;
             position: relative;
@@ -154,7 +154,8 @@
             font-weight: 800;
             letter-spacing: 1px;
             text-transform: uppercase;
-            line-height: 1.2;
+            line-height: 1.35;
+            padding-top: 2px;
             margin-bottom: 6px;
         }
 
@@ -573,7 +574,7 @@
         }
 
         /* ---------------------------------------------------- */
-        /* TRANG BÌA THIỆP TONE SÁNG HIỆN ĐẠI, THANH LỊCH */
+        /* TRANG BÌA THIỆP HẠ TONE DỊU MẮT & KHÔNG KHUẤT DẤU NGÃ */
         /* ---------------------------------------------------- */
         .card-cover {
             position: absolute;
@@ -581,9 +582,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 55%, #e0f2fe 100%);
+            background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 55%, #dbeafe 100%);
             border-radius: 24px;
-            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.18);
+            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.22);
             z-index: 10;
             transform-origin: left center;
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease 0.35s;
@@ -592,14 +593,13 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 30px 20px;
+            padding: 32px 20px;
             cursor: pointer;
             color: #0f172a;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.75);
         }
 
-        /* Hiệu ứng ánh sáng dịu nhẹ ở góc */
         .card-cover::before {
             content: "";
             position: absolute;
@@ -607,7 +607,7 @@
             right: -30%;
             width: 140%;
             height: 140%;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.14) 0%, transparent 65%);
+            background: radial-gradient(circle, rgba(2, 132, 199, 0.12) 0%, transparent 65%);
             pointer-events: none;
         }
 
@@ -626,39 +626,49 @@
             z-index: 2;
         }
 
+        .cover-title-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 8px;
+        }
+
         .cover-invite-text {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             letter-spacing: 2.5px;
             text-transform: uppercase;
             color: #475569;
+            line-height: 1.4;
         }
 
         .cover-main-title {
             font-size: 32px;
             font-weight: 800;
             letter-spacing: 1px;
-            line-height: 1.2;
+            line-height: 1.42;
+            padding-top: 6px;
             text-transform: uppercase;
             background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 6px 0;
+            margin: 4px 0;
         }
 
         .cover-year-text {
             font-size: 15px;
             font-weight: 700;
             letter-spacing: 6px;
-            color: #0284c7;
+            color: #0369a1;
+            line-height: 1.4;
             margin-top: 2px;
         }
 
         .cover-icon-box {
             width: 60px;
             height: 60px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #cbd5e1;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -695,10 +705,10 @@
 
     <div class="card-container" id="invitationCard">
         
-        <!-- BÌA THIỆP TONE SÁNG HIỆN ĐẠI -->
+        <!-- BÌA THIỆP HẠ TONE DỊU MẮT & KHÔNG KHUẤT DẤU NGÃ -->
         <div class="card-cover" onclick="openCard()">
             <div class="cover-content-box">
-                <div>
+                <div class="cover-title-group">
                     <div class="cover-invite-text">Thư mời tham dự</div>
                     <h1 class="cover-main-title">Lễ Tốt Nghiệp</h1>
                     <div class="cover-year-text">2027</div>
@@ -745,7 +755,7 @@
 
                     <!-- XẤP ẢNH POLAROID -->
                     <div class="polaroid-deck-wrapper text-reveal d-3" onclick="event.stopPropagation()">
-                        <div class="polaroid-deck-title"> </div>
+                        <div class="polaroid-deck-title">📸 Khoảnh khắc thanh xuân</div>
                         <div class="polaroid-stack" id="polaroidStack" onclick="nextPolaroid()">
                             <div class="polaroid-card">
                                 <img src="portrait.jpg" alt="Kỷ niệm 3">
