@@ -20,34 +20,37 @@
 :root{
   --ink:#0f172a; --text:#1e293b; --muted:#475569; --soft:#64748b;
   --accent:#0369a1; --line:#cbd5e1;
-  --glass:rgba(255,255,255,.82);
+  --glass:rgba(255,255,255,.84);
   --ease:cubic-bezier(.22,1,.36,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:'Montserrat',system-ui,sans-serif;color:var(--ink);
   background:radial-gradient(circle at top,#cbd5e1 0%,#94a3b8 100%);
-  min-height:100dvh;display:flex;justify-content:center;align-items:center;
-  padding:16px;overflow-x:hidden;
+  min-height:100vh;min-height:100dvh;display:flex;justify-content:center;align-items:center;
+  padding:12px;overflow:hidden;
 }
+html{overflow:hidden}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.glass{background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.9)}
+.glass{background:var(--glass);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.9)}
 
-/* ===== KHUNG THIỆP ===== */
-.card{width:100%;max-width:420px;perspective:1600px;position:relative}
+/* ===== KHUNG THIỆP: thiết kế ở 420px rộng, JS tự phóng/thu cho vừa mọi màn hình ===== */
+.stage{width:calc(420px * var(--s,1));height:calc(var(--h,820px) * var(--s,1));flex:none}
+.card{width:420px;position:relative;perspective:1600px;transform:scale(var(--s,1));transform-origin:top left}
 .inside{
-  position:relative;overflow:hidden;border-radius:24px;background:#f8fafc;
+  position:relative;overflow:hidden;border-radius:24px;background:#f8fafc;min-height:820px;
   box-shadow:0 25px 50px rgba(15,23,42,.18);padding:22px 18px 18px;text-align:center;
-  display:flex;flex-direction:column;gap:10px;min-height:760px;
+  display:flex;flex-direction:column;
 }
-.bg{position:absolute;inset:0;background:url('bg.jpg') center bottom/cover;transform:scale(1.08);transition:transform 6s ease-out}
+/* Làm mờ một lần ngay trên lớp ảnh (nhẹ hơn backdrop-filter phủ cả thiệp) */
+.bg{position:absolute;inset:-8px;background:url('bg.jpg') center bottom/cover;filter:blur(2.5px);
+  transform:scale(1.08);transition:transform 6s ease-out;will-change:transform}
 .card.open .bg{transform:scale(1)}
-.bg-overlay{position:absolute;inset:0;backdrop-filter:blur(2.5px);-webkit-backdrop-filter:blur(2.5px);
-  background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.8) 45%,rgba(255,255,255,.92))}
-.layer{position:relative;z-index:2;display:flex;flex-direction:column;gap:10px;flex:1}
-.layer .spacer{flex:1}
+.card.settled .bg{will-change:auto}
+.bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.8) 45%,rgba(255,255,255,.92))}
+.layer{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
 
 .music{position:absolute;top:0;right:0;width:32px;height:32px;border-radius:50%;
   background:rgba(15,23,42,.85);color:#fff;font-size:14px;z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.2)}
@@ -55,43 +58,50 @@ button{cursor:pointer;border:0;background:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Hiệu ứng xuất hiện (độ trễ theo biến --d) */
-.rv{opacity:0;filter:blur(6px);transform:translateY(14px);
+.rv{opacity:0;filter:blur(6px);transform:translateY(14px);will-change:opacity,transform,filter;
   transition:opacity .8s ease,filter .8s ease,transform .8s var(--ease)}
 .card.open .rv{opacity:1;filter:none;transform:none;transition-delay:calc(var(--d,0)*.13s + .15s)}
+.card.settled .rv{will-change:auto}
 
 .kicker{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.title{font-size:20px;font-weight:800;letter-spacing:1px;text-transform:uppercase;line-height:1.35;margin:2px 0 8px}
+.title{font-size:19px;font-weight:800;letter-spacing:1px;text-transform:uppercase;line-height:1.35;margin:2px 0 6px}
 .guest-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--soft)}
-.guest{width:78%;margin-top:2px;padding:3px 8px;text-align:center;font-size:17px;font-weight:700;
+.guest{width:78%;margin-top:2px;padding:3px 8px;text-align:center;font-size:16px;font-weight:700;
   background:rgba(255,255,255,.75);border:0;border-bottom:1.5px solid rgba(15,23,42,.3);border-radius:4px;outline:0}
 
-/* ===== TÂN CỬ NHÂN ===== */
-.hero{display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:8px}
-.hero .photo{aspect-ratio:3/4;border-radius:20px 20px 20px 56px;overflow:hidden;background:linear-gradient(135deg,#e2e8f0,#bae6fd);
-  box-shadow:0 10px 24px rgba(15,23,42,.18)}
-.hero .photo img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
-.hero .info{text-align:right;padding-bottom:8px}
-.badge{display:inline-block;margin-bottom:6px;padding:3px 10px;border-radius:20px;background:rgba(15,23,42,.88);
+/* ===== TÂN CỬ NHÂN (bố cục gốc: ảnh nép trái, thông tin nép phải) ===== */
+.hero{position:relative;display:flex;align-items:center;height:232px;margin:2px -18px 0;padding-right:18px;overflow:hidden}
+/* ▼ KHUNG CHÈN ẢNH CHÂN DUNG TÁCH NỀN: file PNG trong suốt tên portrait.png */
+.portrait{position:absolute;left:0;bottom:0;width:205px;height:100%;z-index:1;
+  opacity:0;transform:translateX(-30px) scale(1.04);filter:blur(5px);
+  transition:opacity 1.2s var(--ease) .35s,transform 1.2s var(--ease) .35s,filter 1.2s var(--ease) .35s}
+.card.open .portrait{opacity:1;transform:none;filter:none}
+.card.settled .portrait{will-change:auto}
+.portrait img{width:100%;height:100%;object-fit:contain;object-position:left bottom;display:block;
+  filter:drop-shadow(0 10px 14px rgba(15,23,42,.28))}
+.info{position:relative;z-index:3;margin-left:auto;width:52%;text-align:right}
+.badge{display:inline-block;margin-bottom:5px;padding:3px 10px;border-radius:20px;background:rgba(15,23,42,.88);
   color:#fff;font-size:9.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
-.name{font-size:21px;font-weight:800;line-height:1.2;margin-bottom:3px}
+/* Tên luôn 1 dòng: nowrap + JS tự thu cỡ chữ nếu tên quá dài */
+.name{display:block;white-space:nowrap;font-size:20px;font-weight:800;line-height:1.25;margin-bottom:3px}
 .major{font-size:11.5px;font-weight:600;color:#334155;line-height:1.35}
-.thanks{font-size:12px;line-height:1.5;font-style:italic;font-weight:500;color:#334155;padding:0 4px}
+.thanks{font-size:11.5px;line-height:1.45;font-style:italic;font-weight:500;color:#334155;padding:0 4px}
 
 /* ===== POLAROID ===== */
 .deck-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.stack{position:relative;width:150px;height:178px;margin:0 auto}
+.stack{position:relative;width:140px;height:168px;margin:0 auto}
 .pol{position:absolute;inset:0;padding:8px 8px 26px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;
   box-shadow:0 8px 20px rgba(15,23,42,.18);transform:rotate(var(--r,0deg));user-select:none;
   transition:transform .6s cubic-bezier(.34,1.56,.64,1),opacity .5s}
-.pol img{width:100%;height:128px;object-fit:cover;border-radius:3px;display:block;background:#e2e8f0}
+.pol img{width:100%;height:120px;object-fit:cover;border-radius:3px;display:block;background:#e2e8f0}
 .pol span{display:block;margin-top:5px;font-size:11px;font-weight:600;font-style:italic;color:var(--muted)}
-.pol.fly{transform:translate(150px,-50px) rotate(35deg) scale(.9);opacity:0;pointer-events:none}
+.pol.fly{transform:translate(140px,-50px) rotate(35deg) scale(.9);opacity:0;pointer-events:none}
 .hint{font-size:10px;font-style:italic;color:var(--soft);margin-top:4px}
 
 /* ===== ĐẾM NGƯỢC ===== */
 .cd-cap{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
 .cd{display:flex;justify-content:center;gap:6px}
-.cd div{min-width:50px;padding:4px 6px;border-radius:9px;text-align:center}
+.cd div{min-width:50px;padding:4px 6px;border-radius:9px;text-align:center;background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.9)}
 .cd b{display:block;font-size:15px;font-variant-numeric:tabular-nums}
 .cd small{font-size:8.5px;font-weight:600;text-transform:uppercase;color:var(--muted)}
 .cd-done{font-size:12px;font-weight:700;color:var(--accent)}
@@ -111,19 +121,19 @@ button{cursor:pointer;border:0;background:none}
 .wish-form{display:flex;gap:6px}
 .wish-form input{flex:1;min-width:0;padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:12px;outline:0}
 .wish-form button{padding:6px 12px;border-radius:7px;background:var(--ink);color:#fff;font-size:12px;font-weight:600}
-.feed{max-height:56px;overflow-y:auto;margin-top:5px;display:grid;gap:3px}
+.feed{max-height:48px;overflow-y:auto;margin-top:5px;display:grid;gap:3px}
 .feed div{padding:3px 7px;border-radius:5px;background:rgba(241,245,249,.9);font-size:11px;color:var(--text)}
 
 /* ===== NÚT HÀNH ĐỘNG ===== */
-.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:9px 6px;border-radius:18px;
+.actions{display:flex;gap:6px}
+.btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:9px 6px;border-radius:18px;
   font-size:11.5px;font-weight:600;text-decoration:none;text-align:center;line-height:1.2;
   background:var(--ink);color:#fff;transition:transform .15s}
 .btn:active{transform:scale(.97)}
+.btn.map{flex:2}
 .btn.alt{background:rgba(255,255,255,.9);color:#334155;border:1px solid var(--line)}
-.btn.wide{grid-column:1/-1;background:var(--accent)}
-.contact{font-size:11px;font-style:italic;font-weight:500;color:var(--soft);text-align:center}
-.contact a{color:inherit}
+.contact{margin-top:6px;font-size:11px;font-style:italic;font-weight:500;color:var(--soft);text-align:right;padding-right:4px}
+.contact a{color:inherit;text-decoration:none}
 
 /* ===== BÌA THIỆP ===== */
 .cover{
@@ -135,13 +145,15 @@ button{cursor:pointer;border:0;background:none}
     radial-gradient(circle at 75% 84%,rgba(14,165,233,.2),transparent 50%),
     linear-gradient(155deg,#eef2f6,#e2e8f0 52%,#dbeafe);
   box-shadow:0 25px 50px rgba(15,23,42,.24);transform-origin:left center;
-  transition:transform 1s cubic-bezier(.4,0,.2,1),opacity .6s ease .35s;
+  transition:transform 1s cubic-bezier(.4,0,.2,1),opacity .6s ease .35s,visibility 0s 1s;
 }
-.card.open .cover{transform:rotateY(-145deg);opacity:0;pointer-events:none;visibility:hidden;transition:transform 1s cubic-bezier(.4,0,.2,1),opacity .6s ease .35s,visibility 0s 1s}
-.cover::before{content:"";position:absolute;top:-20%;left:-130%;width:75%;height:140%;transform:skewX(-18deg);pointer-events:none;
+.card.open .cover{transform:rotateY(-145deg);opacity:0;pointer-events:none;visibility:hidden}
+/* Vệt sáng tráng gương: chỉ animate transform (không gây reflow) */
+.cover::before{content:"";position:absolute;top:-20%;left:0;width:75%;height:140%;pointer-events:none;z-index:5;will-change:transform;
+  transform:translateX(-170%) skewX(-18deg);
   background:linear-gradient(105deg,transparent,rgba(255,255,255,.15) 35%,rgba(255,255,255,.68) 50%,rgba(255,255,255,.15) 65%,transparent);
   animation:shine 3.6s ease-in-out infinite}
-@keyframes shine{0%{left:-130%}55%,100%{left:160%}}
+@keyframes shine{0%{transform:translateX(-170%) skewX(-18deg)}55%,100%{transform:translateX(230%) skewX(-18deg)}}
 .cover::after{content:"";position:absolute;width:250px;height:250px;border-radius:50%;top:50%;left:50%;
   transform:translate(-50%,-46%);border:1px dashed rgba(3,105,161,.22);pointer-events:none}
 .cover-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:22px;width:100%}
@@ -152,10 +164,11 @@ button{cursor:pointer;border:0;background:none}
 .logo{width:104px;height:104px;border-radius:50%;overflow:hidden;box-shadow:0 12px 28px rgba(15,23,42,.16);background:#fff}
 .logo img{width:100%;height:100%;object-fit:cover;display:block}
 .open-btn{width:82%;padding:13px;border-radius:30px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;
-  letter-spacing:1.5px;text-transform:uppercase;box-shadow:0 10px 25px rgba(15,23,42,.24);animation:pulse 1.8s var(--ease) infinite}
-@keyframes pulse{50%{transform:scale(1.05) translateY(-3px);box-shadow:0 15px 30px rgba(15,23,42,.34)}}
-.cap{position:absolute;top:-10%;font-size:20px;opacity:.7;animation:fall linear infinite;pointer-events:none;z-index:1}
-@keyframes fall{to{transform:translateY(120vh) rotate(360deg)}}
+  letter-spacing:1.5px;text-transform:uppercase;box-shadow:0 10px 25px rgba(15,23,42,.28);animation:pulse 1.8s var(--ease) infinite}
+@keyframes pulse{50%{transform:scale(1.05) translateY(-3px)}}
+.cap{position:absolute;top:-10%;font-size:20px;opacity:.7;animation:fall linear infinite;pointer-events:none;z-index:1;will-change:transform}
+@keyframes fall{to{transform:translateY(900px) rotate(360deg)}}
+.card.open .cover::before,.card.open .cap,.card.open .open-btn{animation-play-state:paused}
 
 .touch-star{position:fixed;pointer-events:none;font-size:15px;z-index:9999;animation:float 1s ease-out forwards}
 @keyframes float{from{transform:translate(-50%,-50%) scale(.5);opacity:1}to{transform:translate(-50%,-60px) scale(1.3);opacity:0}}
@@ -171,7 +184,7 @@ button{cursor:pointer;border:0;background:none}
 .admin.bulk textarea{display:block}
 .admin button.a{padding:7px 12px;border-radius:8px;background:#0284c7;color:#fff;font-size:11px;font-weight:700;white-space:nowrap}
 .admin button.a.ok{background:#16a34a}
-.admin .link{margin-top:6px;font-size:11px;color:#94a3b8;background:none;text-decoration:underline}
+.admin .link{margin-top:6px;font-size:11px;color:#94a3b8;text-decoration:underline}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}
@@ -182,6 +195,7 @@ button{cursor:pointer;border:0;background:none}
 
 <audio id="bgMusic" loop preload="none"></audio>
 
+<div class="stage" id="stage">
 <main class="card" id="card">
 
   <!-- BÌA -->
@@ -203,23 +217,25 @@ button{cursor:pointer;border:0;background:none}
     <div class="layer">
       <button class="music" id="musicBtn" type="button" title="Bật/Tắt nhạc" aria-label="Bật/Tắt nhạc">🎵</button>
 
-      <header class="rv" style="--d:0">
-        <div class="kicker">Thư mời tham dự</div>
-        <div class="title">Lễ Tốt Nghiệp</div>
-        <div class="guest-label">Thân mời</div>
-        <input class="guest" id="guest" type="text" maxlength="40" aria-label="Tên khách mời">
-      </header>
+      <div>
+        <header class="rv" style="--d:0">
+          <div class="kicker">Thư mời tham dự</div>
+          <div class="title">Lễ Tốt Nghiệp</div>
+          <div class="guest-label">Thân mời</div>
+          <input class="guest" id="guest" type="text" maxlength="40" aria-label="Tên khách mời">
+        </header>
 
-      <div class="hero">
-        <div class="photo"><img src="portrait.jpg" alt="Ảnh tân cử nhân" loading="lazy"></div>
-        <div class="info rv" style="--d:1">
-          <span class="badge">Tân Cử Nhân</span>
-          <div class="name" data-k="graduate"></div>
-          <div class="major">Chuyên ngành <span data-k="major"></span></div>
+        <div class="hero">
+          <div class="portrait"><img id="portraitImg" alt="Ảnh tân cử nhân" decoding="async"></div>
+          <div class="info rv" style="--d:1">
+            <span class="badge">Tân Cử Nhân</span>
+            <span class="name" id="gradName" data-k="graduate"></span>
+            <div class="major">Chuyên ngành <span data-k="major"></span></div>
+          </div>
         </div>
-      </div>
 
-      <p class="thanks rv" style="--d:2">"Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"</p>
+        <p class="thanks rv" style="--d:2">"Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"</p>
+      </div>
 
       <div class="rv" style="--d:3">
         <div class="deck-title">📸 Khoảnh khắc thanh xuân</div>
@@ -230,10 +246,10 @@ button{cursor:pointer;border:0;background:none}
       <div class="rv" style="--d:4">
         <div class="cd-cap">Hẹn gặp sau</div>
         <div class="cd" id="cd">
-          <div class="glass"><b id="d">00</b><small>Ngày</small></div>
-          <div class="glass"><b id="h">00</b><small>Giờ</small></div>
-          <div class="glass"><b id="m">00</b><small>Phút</small></div>
-          <div class="glass"><b id="s">00</b><small>Giây</small></div>
+          <div><b id="d">00</b><small>Ngày</small></div>
+          <div><b id="h">00</b><small>Giờ</small></div>
+          <div><b id="m">00</b><small>Phút</small></div>
+          <div><b id="s">00</b><small>Giây</small></div>
         </div>
       </div>
 
@@ -257,20 +273,17 @@ button{cursor:pointer;border:0;background:none}
         <div class="feed" id="feed" aria-live="polite"></div>
       </div>
 
-      <div class="spacer"></div>
-
       <footer class="rv" style="--d:5">
         <div class="actions">
-          <a class="btn" id="mapBtn" target="_blank" rel="noopener">🗺️ Bản đồ</a>
-          <button class="btn alt" id="calBtn" type="button">📅 Thêm lịch</button>
+          <a class="btn map" id="mapBtn" target="_blank" rel="noopener">🗺️ Xem bản đồ</a>
           <button class="btn alt" id="closeBtn" type="button">Đóng bìa</button>
-          <a class="btn wide" id="rsvpBtn">✅ Xác nhận tham dự</a>
         </div>
-        <p class="contact" style="margin-top:6px">Liên hệ: <a id="tel"></a></p>
+        <p class="contact">Liên hệ: <a id="tel"></a></p>
       </footer>
     </div>
   </section>
 </main>
+</div>
 
 <!-- BẢNG TẠO LINK MỜI (mở bằng ?admin=1) -->
 <div class="admin" id="admin">
@@ -291,13 +304,13 @@ const CONFIG = {
   major: 'Luật Kinh Tế',
   year: 2027,
   start: '2027-11-21T09:30:00+07:00',   // giờ bắt đầu (múi giờ VN)
-  durationHours: 3,                      // dùng cho file lịch .ics
   venue: 'Nhà Hát Hòa Bình',
   address: '240 Đường 3/2, Hòa Hưng, TP.HCM',
   mapUrl: 'https://maps.app.goo.gl/aqQmzZK9TjaQgQw47',
   phone: '0909123456',
   phoneText: '0909 123 456',
   defaultGuest: 'Bạn Thân Mến',
+  portrait: 'portrait.png',             // ẢNH CHÂN DUNG TÁCH NỀN (PNG trong suốt)
   music: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3',
   wishEndpoint: '',                      // (tuỳ chọn) URL nhận lời chúc, ví dụ Formspree
   photos: [
@@ -317,8 +330,31 @@ const store = {
 const pad = n => String(n).padStart(2, '0');
 const startAt = new Date(CONFIG.start);
 
+/* ================= CO GIÃN THEO MÀN HÌNH ================= */
+const stage = $('stage'), inside = $('inside');
+function fitScreen() {
+  const pad2 = 24;                                   // lề quanh thiệp
+  const h = inside.offsetHeight;                     // chiều cao thiết kế (chưa scale)
+  const s = Math.min((innerWidth - pad2) / 420, (innerHeight - pad2) / h, 1.6);
+  stage.style.setProperty('--s', s.toFixed(4));
+  stage.style.setProperty('--h', h + 'px');
+}
+addEventListener('resize', fitScreen);
+addEventListener('orientationchange', fitScreen);
+fitScreen();
+
+/* Tên luôn một dòng: thu nhỏ chữ nếu vượt khung */
+function fitName() {
+  const el = $('gradName');
+  el.style.fontSize = '';
+  let fs = parseFloat(getComputedStyle(el).fontSize);
+  const max = el.parentElement.clientWidth;
+  while (el.scrollWidth > max && fs > 11) { fs -= .5; el.style.fontSize = fs + 'px'; }
+}
+
 /* ================= ĐỔ DỮ LIỆU TỪ CONFIG ================= */
 document.querySelectorAll('[data-k]').forEach(el => el.textContent = CONFIG[el.dataset.k]);
+$('portraitImg').src = CONFIG.portrait;
 $('mapBtn').href = CONFIG.mapUrl;
 $('tel').href = 'tel:' + CONFIG.phone;
 $('tel').textContent = CONFIG.phoneText;
@@ -327,6 +363,8 @@ $('when').textContent = new Intl.DateTimeFormat('vi-VN', {
   timeZone: 'Asia/Ho_Chi_Minh', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric',
   hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
 }).format(startAt).replace(',', ' —');
+fitName();
+if (document.fonts) document.fonts.ready.then(() => { fitName(); fitScreen(); });
 
 /* ================= TÊN KHÁCH (?khach=...) & ADMIN (?admin=1) ================= */
 const params = new URLSearchParams(location.search);
@@ -364,6 +402,14 @@ $('aCopy').onclick = async () => {
 };
 $('adminX').onclick = () => $('admin').style.display = 'none';
 
+/* ================= PHÁO GIẤY (chạy bằng worker, không chặn luồng chính) ================= */
+let fire;
+function boom(opts) {
+  if (!window.confetti) return;
+  fire = fire || confetti.create(null, { resize: true, useWorker: true, disableForReducedMotion: true });
+  fire(opts);
+}
+
 /* ================= MỞ / ĐÓNG THIỆP ================= */
 const audio = $('bgMusic'), musicBtn = $('musicBtn');
 if (!CONFIG.music) musicBtn.hidden = true;
@@ -377,12 +423,15 @@ function setMusic(on) {
     audio.pause(); musicBtn.classList.remove('playing');
   }
 }
+let settleTimer;
 function openCard() {
   card.classList.add('open');
-  if (window.confetti) confetti({ particleCount: 110, spread: 75, origin: { y: .6 } });
+  boom({ particleCount: 110, spread: 75, origin: { y: .6 } });
   if (CONFIG.music) setMusic(true);
+  clearTimeout(settleTimer);
+  settleTimer = setTimeout(() => card.classList.add('settled'), 2600);  // bỏ will-change khi đã xong hiệu ứng
 }
-function closeCard() { card.classList.remove('open'); }
+function closeCard() { clearTimeout(settleTimer); card.classList.remove('open', 'settled'); }
 
 $('cover').onclick = openCard;
 $('closeBtn').onclick = closeCard;
@@ -449,41 +498,15 @@ const cd = $('cd');
     cd.innerHTML = '<span class="cd-done">🎉 Buổi lễ đã diễn ra — cảm ơn bạn!</span>';
     return;
   }
-  const sec = Math.floor(diff / 1000);
-  $('d').textContent = pad(Math.floor(sec / 86400));
-  $('h').textContent = pad(Math.floor(sec % 86400 / 3600));
-  $('m').textContent = pad(Math.floor(sec % 3600 / 60));
-  $('s').textContent = pad(sec % 60);
+  if (!document.hidden) {                            // tab ẩn thì khỏi cập nhật DOM
+    const sec = Math.floor(diff / 1000);
+    $('d').textContent = pad(Math.floor(sec / 86400));
+    $('h').textContent = pad(Math.floor(sec % 86400 / 3600));
+    $('m').textContent = pad(Math.floor(sec % 3600 / 60));
+    $('s').textContent = pad(sec % 60);
+  }
   setTimeout(tick, 1000 - Date.now() % 1000);
 })();
-
-/* ================= THÊM VÀO LỊCH (.ics) ================= */
-$('calBtn').onclick = () => {
-  const fmt = d => d.toISOString().replace(/[-:]|\.\d{3}/g, '');
-  const end = new Date(startAt.getTime() + CONFIG.durationHours * 3600e3);
-  const ics = [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Thiep moi tot nghiep//VI', 'BEGIN:VEVENT',
-    'UID:' + startAt.getTime() + '@thiep-tot-nghiep',
-    'DTSTAMP:' + fmt(new Date()), 'DTSTART:' + fmt(startAt), 'DTEND:' + fmt(end),
-    'SUMMARY:Lễ Tốt Nghiệp của ' + CONFIG.graduate,
-    'LOCATION:' + `${CONFIG.venue}, ${CONFIG.address}`.replace(/,/g, '\\,'),
-    'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:Ngày mai là Lễ Tốt Nghiệp', 'END:VALARM',
-    'END:VEVENT', 'END:VCALENDAR'
-  ].join('\r\n');
-  const a = Object.assign(document.createElement('a'), {
-    href: URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' })),
-    download: 'le-tot-nghiep.ics'
-  });
-  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-};
-
-/* ================= XÁC NHẬN THAM DỰ (SMS) ================= */
-function updateRsvp() {
-  const msg = `Mình là ${guestEl.value.trim() || CONFIG.defaultGuest}, mình xác nhận sẽ đến dự Lễ Tốt Nghiệp của ${CONFIG.firstName} ạ!`;
-  $('rsvpBtn').href = `sms:${CONFIG.phone}?body=${encodeURIComponent(msg)}`;
-}
-guestEl.addEventListener('input', updateRsvp);
-updateRsvp();
 
 /* ================= THẢ TIM & LƯU BÚT ================= */
 const counts = store.get('reacts', { heart: 0, cap: 0 });
@@ -491,14 +514,12 @@ const showCounts = () => { $('heart').textContent = counts.heart; $('capn').text
 showCounts();
 document.querySelectorAll('[data-react]').forEach(b => b.onclick = () => {
   counts[b.dataset.react]++; store.set('reacts', counts); showCounts();
-  if (window.confetti) {
-    const r = b.getBoundingClientRect();
-    confetti({
-      particleCount: 14, spread: 50, scalar: .8, startVelocity: 22,
-      origin: { x: (r.left + r.width / 2) / innerWidth, y: r.top / innerHeight },
-      shapes: ['circle'], colors: b.dataset.react === 'heart' ? ['#f43f5e', '#fb7185'] : ['#0369a1', '#38bdf8']
-    });
-  }
+  const r = b.getBoundingClientRect();
+  boom({
+    particleCount: 14, spread: 50, scalar: .8, startVelocity: 22, shapes: ['circle'],
+    origin: { x: (r.left + r.width / 2) / innerWidth, y: r.top / innerHeight },
+    colors: b.dataset.react === 'heart' ? ['#f43f5e', '#fb7185'] : ['#0369a1', '#38bdf8']
+  });
 });
 
 const wishes = store.get('wishes', []);
