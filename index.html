@@ -574,7 +574,7 @@
         }
 
         /* ---------------------------------------------------- */
-        /* TRANG BÌA THIỆP HẠ TONE DỊU MẮT & KHÔNG KHUẤT DẤU NGÃ */
+        /* TRANG BÌA THIỆP: BACKGROUND CÓ CHIỀU SÂU & LOGO TRÀN KHUNG */
         /* ---------------------------------------------------- */
         .card-cover {
             position: absolute;
@@ -582,9 +582,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 55%, #dbeafe 100%);
+            background:
+                radial-gradient(circle at 18% 16%, rgba(56, 189, 248, 0.24) 0%, transparent 45%),
+                radial-gradient(circle at 86% 24%, rgba(129, 140, 248, 0.18) 0%, transparent 48%),
+                radial-gradient(circle at 75% 84%, rgba(14, 165, 233, 0.20) 0%, transparent 50%),
+                linear-gradient(155deg, #eef2f6 0%, #e2e8f0 52%, #dbeafe 100%);
             border-radius: 24px;
-            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.22);
+            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.24);
             z-index: 10;
             transform-origin: left center;
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease 0.35s;
@@ -597,18 +601,37 @@
             cursor: pointer;
             color: #0f172a;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
+        /* Họa tiết lưới chấm/đường mảnh tinh tế trên nền bìa */
         .card-cover::before {
             content: "";
             position: absolute;
-            top: -30%;
-            right: -30%;
-            width: 140%;
-            height: 140%;
-            background: radial-gradient(circle, rgba(2, 132, 199, 0.12) 0%, transparent 65%);
+            inset: 0;
+            background-image:
+                linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+            background-size: 28px 28px;
+            -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,0.85) 20%, rgba(0,0,0,0.1) 85%);
+            mask-image: radial-gradient(circle at center, rgba(0,0,0,0.85) 20%, rgba(0,0,0,0.1) 85%);
             pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Vòng sáng trang trí phía sau logo */
+        .card-cover::after {
+            content: "";
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            border: 1px dashed rgba(3, 105, 161, 0.22);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -46%);
+            pointer-events: none;
+            z-index: 1;
         }
 
         .card-container.is-open .card-cover {
@@ -664,25 +687,26 @@
             margin-top: 2px;
         }
 
-        /* Khung chứa logo trường ở trang bìa */
+        /* Khung logo tràn đầy, không viền trắng thừa */
         .cover-logo-box {
-            width: 92px;
-            height: 92px;
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid #cbd5e1;
+            width: 104px;
+            height: 104px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 12px;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            padding: 0;
+            background: transparent;
+            border: none;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
             overflow: hidden;
         }
 
         .cover-logo-box img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
+            display: block;
         }
 
         .modern-open-btn {
@@ -695,7 +719,7 @@
             font-size: 11.5px;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.22);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.24);
             transition: transform 0.2s, background 0.2s;
         }
 
@@ -713,7 +737,7 @@
 
     <div class="card-container" id="invitationCard">
         
-        <!-- BÌA THIỆP VỚI LOGO TRƯỜNG -->
+        <!-- BÌA THIỆP CÓ BACKGROUND CHIỀU SÂU & LOGO TRÀN KHUNG -->
         <div class="card-cover" onclick="openCard()">
             <div class="cover-content-box">
                 <div class="cover-title-group">
