@@ -752,6 +752,75 @@
             transform: scale(0.97);
             background: #1e293b;
         }
+
+        /* CÔNG CỤ TẠO LINK MỜI NHANH (CHỈ HIỆN KHI MỞ VỚI ?admin=1) */
+        .admin-link-generator {
+            display: none;
+            position: fixed;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 24px);
+            max-width: 420px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+            padding: 10px 12px;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+            z-index: 99999;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .admin-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .admin-input {
+            flex: 1;
+            padding: 7px 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .admin-input::placeholder {
+            color: #64748b;
+        }
+
+        .admin-btn {
+            background: #0284c7;
+            color: #ffffff;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .admin-btn.copied {
+            background: #16a34a;
+        }
     </style>
 </head>
 <body>
@@ -792,7 +861,7 @@
 
                         <div class="guest-box">
                             <div class="guest-label">Thân mời</div>
-                            <input type="text" class="guest-name-input" value="Bạn Thân Mến" onclick="event.stopPropagation()">
+                            <input type="text" id="guestNameInput" class="guest-name-input" value="Bạn Thân Mến" onclick="event.stopPropagation()">
                         </div>
                     </div>
 
@@ -896,10 +965,74 @@
 
     </div>
 
+    <!-- THANH TẠO LINK MỜI NHANH (CHỈ HIỆN KHI THÊM ?admin=1 TRÊN URL) -->
+    <div class="admin-link-generator" id="adminPanel" onclick="event.stopPropagation()">
+        <div class="admin-title">
+            <span>🔗 Tạo link mời riêng</span>
+            <span style="cursor:pointer; color:#cbd5e1;" onclick="document.getElementById('adminPanel').style.display='none'">✕</span>
+        </div>
+        <div class="admin-row">
+            <input type="text" id="adminGuestName" class="admin-input" placeholder="Nhập tên khách (VD: Chị Lan)..." oninput="previewGuestName()">
+            <button type="button" id="copyLinkBtn" class="admin-btn" onclick="copyInviteLink()">Copy link</button>
+        </div>
+    </div>
+
     <script>
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicBtn');
         let isPlaying = false;
+
+        // Xử lý tự động điền tên khách mời từ URL (?khach=...) và hiện bảng tạo link nếu có ?admin=1
+        (function initGuestAndAdmin() {
+            const params = new URLSearchParams(window.location.search);
+            const guestParam = params.get('khach');
+            const guestInput = document.getElementById('guestNameInput');
+            if (guestParam && guestInput) {
+                guestInput.value = guestParam.replace(/\+/g, ' ').trim();
+            }
+            if (params.get('admin') === '1') {
+                document.getElementById('adminPanel').style.display = 'block';
+            }
+        })();
+
+        function previewGuestName() {
+            const val = document.getElementById('adminGuestName').value.trim();
+            const guestInput = document.getElementById('guestNameInput');
+            if (guestInput) {
+                guestInput.value = val || 'Bạn Thân Mến';
+            }
+        }
+
+        function copyInviteLink() {
+            const name = document.getElementById('adminGuestName').value.trim();
+            const baseUrl = window.location.origin + window.location.pathname;
+            const inviteUrl = name ? `${baseUrl}?khach=${encodeURIComponent(name)}` : baseUrl;
+            const btn = document.getElementById('copyLinkBtn');
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(inviteUrl).then(() => {
+                    btn.innerText = 'Đã copy!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.innerText = 'Copy link';
+                        btn.classList.remove('copied');
+                    }, 1800);
+                });
+            } else {
+                const temp = document.createElement('input');
+                temp.value = inviteUrl;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                temp.remove();
+                btn.innerText = 'Đã copy!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerText = 'Copy link';
+                    btn.classList.remove('copied');
+                }, 1800);
+            }
+        }
 
         function openCard() {
             document.getElementById('invitationCard').classList.add('is-open');
