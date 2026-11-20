@@ -405,15 +405,9 @@ fitScale();
 /* ================= TÊN KHÁCH (?khach=...) & ADMIN (?admin=1) ================= */
 const params = new URLSearchParams(location.search);
 const guestEl = $('guest');
-/* Xưng hô: ?khach=Nghĩa → "Bạn Nghĩa". Tên đã có xưng hô ("Cô Lan") thì giữ nguyên.
-   Đổi xưng hô bằng &xh=Cô ; &xh= (rỗng) để hiện tên trơn. */
-const HONORIFIC = /^(anh|chị|cô|chú|bác|thầy|bạn|em|dì|cậu|mợ|ông|bà|gia đình)(\s|$)/i;
-const xh = params.has('xh') ? params.get('xh').trim().slice(0, 12) : 'Bạn';
-const fullName = raw => {
-  raw = raw.trim().slice(0, 40);
-  return !raw || !xh || HONORIFIC.test(raw) ? raw : `${xh} ${raw}`;
-};
-const guestName = fullName(params.get('khach') || '');
+/* Tên khách hiển thị đúng như chủ thiệp điền trong link, vd ?khach=Chị Lan (không tự thêm danh xưng) */
+const cleanName = raw => raw.trim().slice(0, 40);
+const guestName = cleanName(params.get('khach') || '');
 guestEl.value = guestName || CONFIG.defaultGuest;
 if (params.get('admin') === '1') $('admin').style.display = 'block';
 
@@ -427,7 +421,7 @@ async function copy(text) {
     document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
   }
 }
-$('aName').addEventListener('input', e => guestEl.value = fullName(e.target.value) || CONFIG.defaultGuest);
+$('aName').addEventListener('input', e => guestEl.value = cleanName(e.target.value) || CONFIG.defaultGuest);
 $('aToggle').onclick = () => {
   const bulk = $('admin').classList.toggle('bulk');
   $('aToggle').textContent = bulk ? 'Tạo từng link' : 'Tạo hàng loạt';
@@ -516,7 +510,7 @@ function openCard() {
   if (!store.get('opened', false)) { store.set('opened', true); send({ kind: 'open' }); }
   setTimeout(() => {                         // pháo giấy chờ bìa lật xong phần đầu, tránh tranh tài nguyên
     const f = isOpen && getFx();
-    if (f) f({ particleCount: 110, spread: 75, origin: { y: .6 } });
+    if (f) f({ particleCount: 40, spread: 55, startVelocity: 30, origin: { y: .65 } });
   }, 450);
   if (CONFIG.music) setMusic(true);
   clearTimeout(settleTimer);
