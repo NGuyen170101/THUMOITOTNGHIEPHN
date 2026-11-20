@@ -57,8 +57,8 @@ button{cursor:pointer;border:0;background:none}
 .layer{position:relative;z-index:2;display:flex;flex-direction:column;gap:10px;flex:1}
 .layer .spacer{flex:1}
 
-.music{position:absolute;top:0;right:0;width:32px;height:32px;border-radius:50%;
-  background:rgba(15,23,42,.85);color:#fff;font-size:14px;z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.music{position:absolute;top:-6px;right:0;width:26px;height:26px;border-radius:50%;
+  background:rgba(15,23,42,.85);color:#fff;font-size:12px;z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .music.playing{animation:spin 4s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -69,11 +69,18 @@ button{cursor:pointer;border:0;background:none}
 .card.settled .rv{will-change:auto}
 .rv.nb{filter:none!important;transition-property:opacity,transform}
 
-.kicker{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.title{font-size:20px;font-weight:800;letter-spacing:1px;text-transform:uppercase;line-height:1.35;margin:2px 0 8px}
-.guest-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--soft)}
-.guest{width:78%;margin-top:2px;padding:3px 8px;text-align:center;font-size:17px;font-weight:700;
-  background:rgba(255,255,255,.55);border:0;border-bottom:1.5px solid rgba(15,23,42,.3);border-radius:4px;outline:0}
+.kicker{font-size:11px;font-weight:700;letter-spacing:1.8px;text-indent:1.8px;text-transform:uppercase;color:var(--muted)}
+.title{font-size:20px;font-weight:800;letter-spacing:.8px;text-indent:.8px;text-transform:uppercase;line-height:1.35;margin:1px 0 0}
+/* Đường kẻ ✦ chia tiêu đề / khối "ai mời ai" */
+.orn{display:flex;align-items:center;justify-content:center;gap:8px;width:60%;margin:9px auto 11px}
+.orn i{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(15,23,42,.35))}
+.orn i:last-child{background:linear-gradient(270deg,transparent,rgba(15,23,42,.35))}
+.orn span{font-size:10px;line-height:1;color:var(--accent)}
+.guest-label{font-size:10px;font-weight:600;letter-spacing:1.2px;text-indent:1.2px;text-transform:uppercase;color:var(--soft)}
+.guest{display:block;width:88%;margin:1px auto 0;padding:1px 6px 6px;text-align:center;font-size:20px;font-weight:800;color:var(--ink);
+  background:linear-gradient(90deg,transparent,rgba(3,105,161,.55) 18%,rgba(3,105,161,.55) 82%,transparent) bottom/100% 1.5px no-repeat;
+  border:0;border-radius:0;outline:0}
+.guest{cursor:default}
 
 /* ===== KÍNH LỎNG (LIQUID GLASS) cho các hộp văn bản ===== */
 .glass{
@@ -107,7 +114,7 @@ button{cursor:pointer;border:0;background:none}
 .name{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:3px;white-space:nowrap}
 .major{font-size:11.5px;font-weight:600;color:#334155;line-height:1.35}
 
-.lead{margin-top:6px;font-size:11.5px;font-style:italic;font-weight:500;color:var(--muted)}
+.lead{margin-top:5px;font-size:11.5px;font-style:italic;font-weight:500;color:var(--muted)}
 .thanks{padding:10px 14px;font-size:12px;line-height:1.5;font-style:italic;font-weight:500;color:#334155}
 
 /* ===== POLAROID ===== */
@@ -181,15 +188,15 @@ button{cursor:pointer;border:0;background:none}
 .cover::after{content:"";position:absolute;width:250px;height:250px;border-radius:50%;top:50%;left:50%;
   transform:translate(-50%,-46%);border:1px dashed rgba(3,105,161,.22);pointer-events:none}
 .cover-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:22px;width:100%}
-.cover .invite{font-size:12.5px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}
-.cover h1{margin:6px 0 2px;padding-top:4px;font-size:32px;font-weight:800;letter-spacing:1px;line-height:1.35;text-transform:uppercase;
+.cover .invite{font-size:12.5px;font-weight:600;letter-spacing:2.5px;text-indent:2.5px;text-transform:uppercase;color:var(--muted)}
+.cover h1{text-indent:1px;margin:6px 0 2px;padding-top:4px;font-size:32px;font-weight:800;letter-spacing:1px;line-height:1.35;text-transform:uppercase;
   background:linear-gradient(135deg,#0f172a,#334155);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.cover .year{font-size:15px;font-weight:700;letter-spacing:6px;color:var(--accent)}
+.cover .year{font-size:15px;font-weight:700;letter-spacing:6px;text-indent:6px;color:var(--accent)}
 .logo{width:104px;height:104px;border-radius:50%;overflow:hidden;box-shadow:0 12px 28px rgba(15,23,42,.16);background:#fff}
 .logo img{width:100%;height:100%;object-fit:cover;display:block}
 /* Nhấp nhô: chỉ animate transform (bỏ animate box-shadow vì tốn repaint) */
 .open-btn{position:relative;width:82%;padding:13px;border-radius:30px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;
-  letter-spacing:1.5px;text-transform:uppercase;box-shadow:0 12px 26px rgba(15,23,42,.28);will-change:transform;animation:pulse 1.8s var(--ease) infinite}
+  letter-spacing:1.5px;text-indent:1.5px;text-transform:uppercase;box-shadow:0 12px 26px rgba(15,23,42,.28);will-change:transform;animation:pulse 1.8s var(--ease) infinite}
 @keyframes pulse{50%{transform:scale(1.05) translateY(-3px)}}
 /* Mở thiệp rồi thì dừng toàn bộ animation vô hạn của bìa cho nhẹ máy */
 .card.open .cover *,.card.open .cover::before{animation-play-state:paused!important}
@@ -244,10 +251,11 @@ button{cursor:pointer;border:0;background:none}
       <button class="music" id="musicBtn" type="button" title="Bật/Tắt nhạc" aria-label="Bật/Tắt nhạc">🎵</button>
 
       <header class="rv" style="--d:0">
-        <div class="kicker">Thư mời tham dự</div>
+        <div class="kicker">Thư mời</div>
         <div class="title">Lễ Tốt Nghiệp</div>
+        <div class="orn" aria-hidden="true"><i></i><span>✦</span><i></i></div>
         <div class="guest-label">Thân mời</div>
-        <input class="guest" id="guest" type="text" maxlength="40" aria-label="Tên khách mời">
+        <input class="guest" id="guest" type="text" maxlength="40" aria-label="Tên khách mời" readonly tabindex="-1">
         <p class="lead">đến tham dự lễ tốt nghiệp của</p>
       </header>
 
@@ -337,7 +345,7 @@ const CONFIG = {
   mapUrl: 'https://maps.app.goo.gl/aqQmzZK9TjaQgQw47',
   phone: '0909123456',
   phoneText: '0909 123 456',
-  defaultGuest: 'Bạn Thân Mến',
+  defaultGuest: 'Quý Anh Chị / Bạn Bè',
   portrait: 'portrait.png',               // ẢNH CHÂN DUNG TÁCH NỀN (PNG trong suốt, 3:4, vd 660×880)
   music: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3',
   wishEndpoint: '',                      // URL Web app của Google Apps Script (kết thúc bằng /exec) — để trống = không gửi về đâu cả
@@ -398,8 +406,8 @@ function fitName() {
   while (el.scrollWidth > el.clientWidth && fs > 11) el.style.fontSize = (--fs) + 'px';
 }
 fitName();
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitName(); fitScale(); });
-addEventListener('load', () => { fitName(); fitScale(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitName(); fitGuest(); fitScale(); });
+addEventListener('load', () => { fitName(); fitGuest(); fitScale(); });
 fitScale();
 
 /* ================= TÊN KHÁCH (?khach=...) & ADMIN (?admin=1) ================= */
@@ -409,6 +417,12 @@ const guestEl = $('guest');
 const cleanName = raw => raw.trim().slice(0, 40);
 const guestName = cleanName(params.get('khach') || '');
 guestEl.value = guestName || CONFIG.defaultGuest;
+/* Tên khách do chủ thiệp ghi sẵn trong link — hiển thị như chữ in (chỉ đọc) */
+function fitGuest() {                                   // tên dài thì thu nhỏ chữ cho vừa 1 dòng
+  let fs = 20; guestEl.style.fontSize = fs + 'px';
+  while (guestEl.scrollWidth > guestEl.clientWidth && fs > 12) guestEl.style.fontSize = (--fs) + 'px';
+}
+fitGuest();
 if (params.get('admin') === '1') $('admin').style.display = 'block';
 
 const baseUrl = location.origin + location.pathname;
@@ -421,7 +435,7 @@ async function copy(text) {
     document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
   }
 }
-$('aName').addEventListener('input', e => guestEl.value = cleanName(e.target.value) || CONFIG.defaultGuest);
+$('aName').addEventListener('input', e => { guestEl.value = cleanName(e.target.value) || CONFIG.defaultGuest; fitGuest(); });
 $('aToggle').onclick = () => {
   const bulk = $('admin').classList.toggle('bulk');
   $('aToggle').textContent = bulk ? 'Tạo từng link' : 'Tạo hàng loạt';
