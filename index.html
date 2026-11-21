@@ -37,6 +37,7 @@
   --ink:#0f172a; --text:#1e293b; --muted:#475569; --soft:#64748b;
   --accent:#0369a1; --line:#cbd5e1;
   --ease:cubic-bezier(.22,1,.36,1);
+  --flip:cubic-bezier(.3,.55,.2,1);   /* nhịp chung: lật bìa + giãn thiệp + scale (1 chỗ đổi cả 3) */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -57,13 +58,13 @@ button,a{-webkit-tap-highlight-color:transparent}
 .card{width:420px;position:absolute;top:0;left:0;transform:scale(var(--s,1));transform-origin:top left;perspective:1600px}
 
 /* Chỉ bật chuyển động scale sau lần chạm đầu tiên (tránh thiệp bị 'nhảy' khi vừa tải trang) */
-.anim .card{transition:transform .8s var(--ease)}
-.anim .stage{transition:width .8s var(--ease)}
+.anim .card{transition:transform .9s var(--flip)}
+.anim .stage{transition:width .9s var(--flip),height .9s var(--flip)}   /* height: để thiệp không 'nhảy' vị trí khi mở/đóng */
 .inside{
   position:relative;overflow:hidden;border-radius:24px;background:#f8fafc;
   box-shadow:0 25px 50px rgba(15,23,42,.18);padding:22px 18px 18px;text-align:center;
   display:flex;flex-direction:column;gap:10px;height:var(--cover-h,740px);contain:paint;
-  transition:height 1s cubic-bezier(.4,0,.2,1);   /* dài ra / co lại ĐỒNG BỘ với bìa lật */
+  transition:height .9s var(--flip);   /* dài ra / co lại ĐỒNG BỘ với bìa lật */
 }
 /* Blur nền áp thẳng lên ảnh (rẻ hơn backdrop-filter phủ cả thiệp khi ảnh đang zoom) */
 .bg{position:absolute;top:-6px;left:-6px;right:-6px;height:calc(var(--full-h,1100px) + 12px);background:url('bg.jpg') center bottom/cover;filter:blur(2.5px);
@@ -80,9 +81,11 @@ button,a{-webkit-tap-highlight-color:transparent}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Hiệu ứng xuất hiện (độ trễ theo biến --d) */
-.rv{opacity:.01;filter:blur(6px);transform:translateY(14px);will-change:opacity,filter,transform;
-  transition:opacity .8s ease,filter .8s ease,transform .8s var(--ease)}
-.card.open .rv{opacity:1;filter:none;transform:none;transition-delay:calc(var(--d,0)*.13s + .15s)}
+.rv{opacity:.01;filter:blur(4px);transform:translateY(14px);will-change:opacity,filter,transform;
+  transition:opacity .3s ease,filter .3s ease,transform .3s ease}                 /* đóng: mờ nhanh */
+.card.open .rv{opacity:1;filter:none;transform:none;
+  transition:opacity .7s ease,filter .7s ease,transform .7s var(--ease);
+  transition-delay:calc(var(--d,0)*.09s + .08s)}                                   /* mở: hiện dần, lệch nhau 0,09s */
 .card.settled .rv{will-change:auto}
 .rv.nb{filter:none!important;transition-property:opacity,transform}
 
@@ -116,10 +119,11 @@ button,a{-webkit-tap-highlight-color:transparent}
   position:absolute;left:0;top:0;width:165px;height:220px;z-index:1;
   -webkit-mask-image:linear-gradient(to bottom,#000 82%,transparent 100%);
   mask-image:linear-gradient(to bottom,#000 82%,transparent 100%);
-  opacity:.01;transform:translateX(-30px) scale(1.04);filter:blur(5px);will-change:opacity,transform,filter;
-  transition:opacity 1.2s var(--ease) .35s,transform 1.2s var(--ease) .35s,filter 1.2s var(--ease) .35s;
+  opacity:.01;transform:translateX(-30px) scale(1.04);filter:blur(4px);will-change:opacity,transform,filter;
+  transition:opacity .3s ease,transform .3s ease,filter .3s ease;
 }
-.card.open .photo{opacity:1;transform:none;filter:none}
+.card.open .photo{opacity:1;transform:none;filter:none;
+  transition:opacity 1s var(--ease) .2s,transform 1s var(--ease) .2s,filter 1s var(--ease) .2s}
 .card.settled .photo{will-change:auto}
 .photo img{width:100%;height:100%;object-fit:contain;object-position:left bottom;display:block;
   filter:drop-shadow(0 6px 10px rgba(15,23,42,.25))}
@@ -191,10 +195,10 @@ button,a{-webkit-tap-highlight-color:transparent}
     radial-gradient(circle at 75% 84%,rgba(14,165,233,.2),transparent 50%),
     linear-gradient(155deg,#eef2f6,#e2e8f0 52%,#dbeafe);
   box-shadow:0 25px 50px rgba(15,23,42,.24);transform-origin:left center;will-change:transform,opacity;backface-visibility:hidden;
-  transition:transform 1s cubic-bezier(.4,0,.2,1),opacity .6s ease .35s,visibility 0s;
+  transition:transform .9s var(--flip),opacity .3s ease,visibility 0s;          /* đóng: hiện ngay, lật về */
 }
 .card.open .cover{transform:rotateY(-145deg);opacity:0;pointer-events:none;visibility:hidden;
-  transition:transform 1s cubic-bezier(.4,0,.2,1),opacity .6s ease .35s,visibility 0s 1s}
+  transition:transform .9s var(--flip),opacity .5s ease .25s,visibility 0s .9s}   /* mở: lật rồi mờ dần */
 /* Vệt sáng tráng gương: chỉ animate transform (GPU), không animate left như trước */
 .cover::before{content:"";position:absolute;top:-20%;left:0;width:75%;height:140%;pointer-events:none;will-change:transform;
   background:linear-gradient(105deg,transparent,rgba(255,255,255,.15) 35%,rgba(255,255,255,.68) 50%,rgba(255,255,255,.15) 65%,transparent);
