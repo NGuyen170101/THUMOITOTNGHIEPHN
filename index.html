@@ -14,7 +14,7 @@
   5) Đổi màu: CSS biến ở đầu phần <style> (:root). Đổi chữ cố định ("Tân Cử Nhân", "Khoảnh khắc thanh xuân"...): tìm trực tiếp trong phần HTML.
   6) Muốn nhận lời chúc/tim: làm theo hướng dẫn Code.gs rồi điền wishEndpoint + token trong CONFIG.
   7) Bật/tắt từng hiệu ứng (nhòe dần, kính mờ, zoom nền, pháo giấy, sao, rung...): khối EFFECTS ngay dưới CONFIG (true = bật, false = tắt).
-  8) Ảnh chân dung to/nhỏ: CONFIG.portraitWidth (chiều cao tự theo tỉ lệ 3:4, bìa tự cao thêm cho vừa).
+  8) Ảnh chân dung tách nền: thiệp TỰ cắt phần trong suốt thừa quanh người rồi phóng vừa khung. Chỉnh cao/thấp, lệch trái-phải, độ mờ viền phải: CONFIG.portraitHeight / portraitX / portraitFade.
 -->
 <html lang="vi">
 <head>
@@ -66,7 +66,7 @@ button,a{-webkit-tap-highlight-color:transparent}
   position:relative;overflow:hidden;border-radius:24px;background:#f8fafc;
   box-shadow:0 25px 50px rgba(15,23,42,.18);padding:22px 18px 18px;text-align:center;
   display:flex;flex-direction:column;gap:10px;height:var(--cover-h,740px);contain:paint;
-  transition:height var(--expand,0s) var(--flip);   /* mặc định bung tức thì (0s) — xem EXPAND_MS trong script */
+  transition:height var(--expand,0s) var(--flip),opacity .4s ease .6s;   /* height: mặc định bung tức thì (0s) — xem EXPAND_MS. opacity: hiện lại sau khi bìa úp xong */
 }
 /* Blur nền áp thẳng lên ảnh (rẻ hơn backdrop-filter phủ cả thiệp khi ảnh đang zoom) */
 .bg{position:absolute;top:-6px;left:-6px;right:-6px;height:calc(var(--full-h,1100px) + 12px);background:url('bg.jpg') center bottom/cover;filter:blur(2.5px);
@@ -92,6 +92,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 .card.expanded .rv.low{transition-delay:calc((var(--d,0) - 3)*.09s + .05s)}
 /* đóng: mọi nội dung mờ nhanh trước khi co lại */
 .card.open.collapsing .rv,.card.open.collapsing .photo{opacity:.01;transition:opacity .25s ease,transform .25s ease;transition-delay:0s}
+.card.collapsing .inside{opacity:0;transition:height var(--expand,0s) var(--flip),opacity .28s ease}   /* đóng: cả trang trong mờ đi rồi mới co lại → không bị nhảy */
 .card.settled .rv{will-change:auto}
 /* ===== Công tắc hiệu ứng (bật/tắt trong khối EFFECTS ở script) ===== */
 .fx-blur-in .rv,.fx-blur-in .photo{filter:blur(4px);transition-property:opacity,transform,filter}
@@ -103,7 +104,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 .no-cover-shine .cover::before{display:none}
 .no-cover-flip .card.open .cover{transform:none}
 .no-pulse-button .open-btn,.no-music-spin .music.playing{animation:none}
-.no-portrait-shadow .photo img{filter:none}
+.no-portrait-shadow .photo-sh{filter:none}
 
 .kicker{font-size:11px;font-weight:700;letter-spacing:1.8px;text-indent:1.8px;text-transform:uppercase;color:var(--muted)}
 .title{font-size:20px;font-weight:800;letter-spacing:.8px;text-indent:.8px;text-transform:uppercase;line-height:1.35;margin:1px 0 0}
@@ -130,20 +131,24 @@ button,a{-webkit-tap-highlight-color:transparent}
   background:radial-gradient(120% 90% at 10% -15%,rgba(255,255,255,.6),transparent 55%)}
 
 /* ===== TÂN CỬ NHÂN (ảnh nép trái) ===== */
-.hero{position:relative;display:flex;align-items:center;min-height:calc(var(--pw,240px) * 4 / 3);margin:2px -18px calc(-10px - var(--sink,6px));padding-right:18px}
+.hero{position:relative;display:flex;align-items:center;min-height:var(--ph,290px);margin:2px -18px calc(-10px - var(--sink,6px));padding-right:18px}
 /* margin-bottom âm = triệt khoảng cách 10px tới khung bên dưới + chui --sink (px) dưới mép kính → đáy ảnh luôn sát/khít khung. Chỉnh CONFIG.portraitSink */
-/* Chỗ chèn ảnh chân dung tách nền: file portrait.png (PNG nền trong suốt, tỉ lệ 3:4, vd 660×880) */
+/* ẢNH CHÂN DUNG TÁCH NỀN. 3 lớp: .photo (animation hiện) > .photo-sh (bóng đổ) > .photo-in (cắt + mờ viền phải) > img.
+   JS tự đo phần người trong PNG rồi đặt --iw/--ih/--il/--ib cho ảnh vừa khung; nếu không đo được (mở file trực tiếp...) dùng cỡ mặc định bên dưới. */
 .photo{
-  position:absolute;left:0;top:0;bottom:0;width:var(--pw,240px);z-index:1;   /* rộng = CONFIG.portraitWidth, cao theo 3:4. Đáy ảnh = đáy khối hero */
+  position:absolute;left:var(--px,16px);bottom:0;width:var(--fw,235px);height:var(--ph,290px);z-index:1;pointer-events:none;
   opacity:.01;transform:translateX(-30px) scale(1.04);will-change:opacity,transform;
   transition:opacity .3s ease,transform .3s ease;
 }
 .card.open .photo{opacity:1;transform:none;
   transition:opacity 1s var(--ease) .2s,transform 1s var(--ease) .2s}
 .card.settled .photo{will-change:auto}
-.photo img{width:100%;height:100%;object-fit:contain;object-position:left bottom;display:block;
-  filter:drop-shadow(2px 4px 9px rgba(15,23,42,.24))}   /* bóng nhẹ — chỉnh độ đậm ở số .24 */
-.info{position:relative;z-index:3;margin-left:auto;width:calc(100% - var(--pw,240px) + 30px);min-width:0;padding-left:4px;text-align:right}
+.photo-sh{width:100%;height:100%;filter:drop-shadow(2px 4px 9px rgba(15,23,42,.24))}   /* bóng nhẹ — chỉnh độ đậm ở số .24 */
+.photo-in{position:relative;width:100%;height:100%;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - var(--fade,40px)),transparent);   /* mờ dần viền phải cho mềm, không bị cắt cứng */
+  mask-image:linear-gradient(to right,#000 calc(100% - var(--fade,40px)),transparent)}
+.photo-in img{position:absolute;left:var(--il,0);bottom:var(--ib,0);width:var(--iw,auto);height:var(--ih,100%);max-width:none;display:block}
+.info{position:relative;z-index:3;margin-left:auto;width:54%;min-width:0;padding-left:4px;text-align:right}
 .badge{display:inline-block;margin-bottom:6px;padding:3px 10px;border-radius:20px;background:rgba(15,23,42,.88);
   color:#fff;font-size:9.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
 /* Tên luôn 1 dòng: nowrap + JS tự thu nhỏ chữ nếu tên quá dài */
@@ -302,7 +307,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 
       <div class="hero">
         <!-- ẢNH CHÂN DUNG TÁCH NỀN: đặt file portrait.png cạnh index.html (đổi đường dẫn ở CONFIG.portrait) -->
-        <div class="photo"><img id="portrait" alt="Ảnh tân cử nhân"></div>
+        <div class="photo"><div class="photo-sh"><div class="photo-in"><img id="portrait" alt="Ảnh tân cử nhân"></div></div></div>
         <div class="info rv" style="--d:1">
           <span class="badge">Tân Cử Nhân</span>
           <div class="name" id="name"></div>
@@ -397,7 +402,10 @@ const CONFIG = {
   thanks: '"Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"',
 
   /* --- Hình ảnh (đặt file cạnh index.html, hoặc dán link ảnh đầy đủ) --- */
-  portraitWidth: 240,             // px chiều rộng ảnh chân dung (cao = rộng × 4/3). To hơn → tăng số này (vd 260). Bìa tự cao thêm cho vừa
+  portraitHeight: 290,            // px CHIỀU CAO người trong thiệp (đã tự cắt phần trong suốt thừa). To hơn → tăng (vd 320); bìa tự cao thêm cho vừa
+  portraitMaxWidth: 270,          // px bề ngang tối đa của người (người quá rộng thì tự thu nhỏ để không đè sang chữ bên phải)
+  portraitX: 16,                  // px cách lề trái. Âm = lệch sang trái, dương = sang phải
+  portraitFade: 40,               // px độ rộng vùng mờ dần ở mép phải ảnh (0 = không mờ)
   portraitSink: 6,                // px ảnh chui xuống dưới mép khung "Sự hiện diện...". Còn hở khe giữa ảnh và khung → tăng số này (vd 10)
   portrait: 'portrait.png',       // ẢNH CHÂN DUNG TÁCH NỀN: PNG nền trong suốt, tỉ lệ 3:4 (vd 660×880), cắt từ đầu đến ngực
   photos: [                       // Xấp ảnh polaroid — thêm/bớt dòng tùy ý (nên 3–5 ảnh)
@@ -443,7 +451,7 @@ Object.entries(EFFECTS).forEach(([k, on]) =>
 
 /* --- Tinh chỉnh giao diện (ít khi cần đổi) --- */
 const DESIGN_W   = 420;   // Bề ngang thiết kế gốc (px). Thiệp tự co giãn theo bề ngang màn hình
-const COVER_H    = 760 + Math.max(0, Math.round(CONFIG.portraitWidth * 4 / 3 - 260));   // Chiều cao trang bìa (px, trước khi scale). Tự tăng theo cỡ ảnh chân dung; muốn bìa cao hơn nữa thì cộng thêm số vào cuối
+const COVER_H    = 760 + Math.max(0, CONFIG.portraitHeight - 260);   // Chiều cao trang bìa (px, trước khi scale). Tự tăng theo cỡ ảnh chân dung; muốn bìa cao hơn nữa thì cộng thêm số vào cuối
 const MAX_SCALE  = 1.5;   // Phóng to tối đa trên tablet/PC (1 = không phóng to)
 const EXPAND_AT  = 750;   // ms sau khi chạm thì bung phần dưới ra (≈ lúc bìa lật xong)
 const SETTLE_MS  = 2500;  // ms sau khi mở thì kính mờ (blur) mới bật. Nhỏ hơn = blur hiện sớm hơn (nhưng dễ giật hơn lúc đang chuyển động)
@@ -473,7 +481,9 @@ function fitText(el, max, min) {                     // Thu nhỏ chữ dần ch
    Đang đóng (bìa): scale đều để vừa cả ngang lẫn dọc. Đã mở: chỉ theo bề ngang, nội dung dài thì cuộn. */
 document.documentElement.style.setProperty('--cover-h', COVER_H + 'px');
 document.documentElement.style.setProperty('--sink', CONFIG.portraitSink + 'px');
-document.documentElement.style.setProperty('--pw', CONFIG.portraitWidth + 'px');
+document.documentElement.style.setProperty('--ph', CONFIG.portraitHeight + 'px');
+document.documentElement.style.setProperty('--px', CONFIG.portraitX + 'px');
+document.documentElement.style.setProperty('--fade', CONFIG.portraitFade + 'px');
 document.documentElement.style.setProperty('--expand', EXPAND_MS + 'ms');
 let fullH = COVER_H;                                 // chiều cao thiệp khi đã mở (đo từ nội dung)
 const INSIDE_PAD = 40;                               // padding trên + dưới của .inside (22 + 18)
@@ -499,6 +509,35 @@ if ('ResizeObserver' in window) new ResizeObserver(() => { measureFull(); fitSca
 /* ---------- Đổ dữ liệu từ CONFIG vào thiệp ---------- */
 document.querySelectorAll('[data-k]').forEach(el => el.textContent = CONFIG[el.dataset.k]);
 $('name').textContent = CONFIG.graduate;
+/* Ảnh chân dung: đo vùng có hình người (bỏ phần trong suốt thừa) rồi phóng cho người cao đúng portraitHeight, đáy chạm đáy khối */
+function fitPortrait() {
+  const img = $('portrait'), root = document.documentElement.style;
+  try {
+    const nw = img.naturalWidth, nh = img.naturalHeight;
+    if (!nw || !nh) return;
+    const k = Math.min(1, 240 / Math.max(nw, nh));
+    const w = Math.max(1, Math.round(nw * k)), h = Math.max(1, Math.round(nh * k));
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const g = cv.getContext('2d', { willReadFrequently: true });
+    g.drawImage(img, 0, 0, w, h);
+    const d = g.getImageData(0, 0, w, h).data;
+    let x0 = w, x1 = -1, y0 = h, y1 = -1;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (d[(y * w + x) * 4 + 3] > 24) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    if (x1 < 0) return;                                           // ảnh trống
+    const fx = x0 / w, fw = (x1 + 1 - x0) / w, fy = y0 / h, fh = (y1 + 1 - y0) / h;   // khung người (tỉ lệ 0–1 so với file ảnh)
+    let H = CONFIG.portraitHeight / fh, W = H * nw / nh;          // cao ảnh để người cao đúng portraitHeight
+    if (fw * W > CONFIG.portraitMaxWidth) { W = CONFIG.portraitMaxWidth / fw; H = W * nh / nw; }   // quá rộng → co theo bề ngang
+    root.setProperty('--fw', fw * W + 'px');                      // rộng khung = rộng người
+    root.setProperty('--ph', fh * H + 'px');                      // cao khung = cao người
+    root.setProperty('--iw', W + 'px'); root.setProperty('--ih', H + 'px');
+    root.setProperty('--il', -fx * W + 'px');                     // dịch ảnh để mép trái người sát mép trái khung
+    root.setProperty('--ib', -(1 - fy - fh) * H + 'px');          // dịch ảnh để mép dưới người sát đáy khung
+    fitAll();
+  } catch (e) { /* canvas bị chặn (mở file trực tiếp / ảnh ở tên miền khác) → dùng cỡ mặc định */ }
+}
+$('portrait').onload = fitPortrait;
 $('portrait').src = CONFIG.portrait;
 $('mapBtn').href = CONFIG.mapUrl;
 $('tel').href = 'tel:' + CONFIG.phone;
@@ -633,13 +672,12 @@ document.addEventListener('visibilitychange', () => {
 });
 
 /* ---------- Mở / đóng thiệp ---------- */
-let isOpen = false, busy = false, settleTimer, expandTimer, collapseTimer;
+let isOpen = false, busy = false, settleTimer, expandTimer;
 /* MỞ: ① bìa lật + phần trên thiệp hiện (cùng cao COVER_H → khớp nhau)  ② lật xong mới bung phần dưới (đúng 1 lần, không animate layout) */
 function openCard() {
   if (isOpen || busy) return;
   isOpen = true;
   const inside = $('inside');
-  clearTimeout(collapseTimer);
   document.body.classList.add('anim');
   measureFull();
   card.classList.add('open');
@@ -665,21 +703,26 @@ function openCard() {
     if (isOpen) inside.style.height = 'auto';
   }, SETTLE_MS);
 }
-/* ĐÓNG: ① nội dung mờ nhanh  ② co về cao bằng bìa (tức thì) rồi bìa mới lật về → luôn khớp nhau */
+/* ĐÓNG: ① cuộn về đầu trang + nội dung & trang trong mờ dần  ② khi đã yên mới co về cao bằng bìa  ③ bìa lật về → không có cú nhảy nào */
 function closeCard() {
   if (!isOpen || busy) return;
   busy = true;
   clearTimeout(expandTimer); clearTimeout(settleTimer);
-  const inside = $('inside');
+  card.classList.remove('settled');                    // tắt blur kính trước cho nhẹ
   card.classList.add('collapsing');
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  collapseTimer = setTimeout(() => {
-    expanded = false;
-    inside.style.height = COVER_H + 'px';
-    card.classList.remove('open', 'expanded', 'collapsing', 'settled');
-    isOpen = false; busy = false;
-    fitScale();
-  }, 280);
+  const t0 = performance.now();
+  (function waitQuiet() {                              // chờ cuộn xong + mờ xong (tránh trang bị giật khi co lại lúc đang cuộn)
+    const t = performance.now() - t0;
+    if ((t > 300 && scrollY < 2) || t > 900) finishClose(); else requestAnimationFrame(waitQuiet);
+  })();
+}
+function finishClose() {
+  expanded = false;
+  $('inside').style.height = COVER_H + 'px';
+  card.classList.remove('open', 'expanded', 'collapsing');
+  isOpen = false; busy = false;
+  fitScale();
 }
 $('cover').onclick = openCard;
 $('closeBtn').onclick = closeCard;
