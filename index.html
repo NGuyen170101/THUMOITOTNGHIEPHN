@@ -43,7 +43,7 @@
 body{
   font-family:'Montserrat',system-ui,sans-serif;color:var(--ink);
   background:radial-gradient(circle at top,#cbd5e1 0%,#94a3b8 100%) fixed;
-  min-height:100dvh;display:flex;justify-content:center;align-items:center;
+  min-height:100dvh;display:flex;justify-content:center;align-items:flex-start;
   padding:12px;overflow-x:hidden;
 }
 button,input{font:inherit;color:inherit}
@@ -59,16 +59,16 @@ button,a{-webkit-tap-highlight-color:transparent}
 
 /* Chỉ bật chuyển động scale sau lần chạm đầu tiên (tránh thiệp bị 'nhảy' khi vừa tải trang) */
 .anim .card{transition:transform .9s var(--flip)}
-.anim .stage{transition:width .9s var(--flip),height .9s var(--flip)}   /* height: để thiệp không 'nhảy' vị trí khi mở/đóng */
+.anim .stage{transition:width .9s var(--flip),height var(--expand,0s) var(--flip)}
 .inside{
   position:relative;overflow:hidden;border-radius:24px;background:#f8fafc;
   box-shadow:0 25px 50px rgba(15,23,42,.18);padding:22px 18px 18px;text-align:center;
   display:flex;flex-direction:column;gap:10px;height:var(--cover-h,740px);contain:paint;
-  transition:height .9s var(--flip);   /* dài ra / co lại ĐỒNG BỘ với bìa lật */
+  transition:height var(--expand,0s) var(--flip);   /* mặc định bung tức thì (0s) — xem EXPAND_MS trong script */
 }
 /* Blur nền áp thẳng lên ảnh (rẻ hơn backdrop-filter phủ cả thiệp khi ảnh đang zoom) */
 .bg{position:absolute;top:-6px;left:-6px;right:-6px;height:calc(var(--full-h,1100px) + 12px);background:url('bg.jpg') center bottom/cover;filter:blur(2.5px);
-  transform:scale(1.08);transition:transform 2.4s ease-out;will-change:transform}
+  transform:scale(1.08);transition:transform .9s ease-out;will-change:transform}   /* zoom nền xong trong lúc bìa lật, trước khi kính hiện */
 .card.open .bg{transform:scale(1)}
 .card.settled .bg{will-change:auto}
 .bg-overlay{position:absolute;top:0;left:0;right:0;height:var(--full-h,1100px);
@@ -81,13 +81,16 @@ button,a{-webkit-tap-highlight-color:transparent}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Hiệu ứng xuất hiện (độ trễ theo biến --d) */
-.rv{opacity:.01;filter:blur(4px);transform:translateY(14px);will-change:opacity,filter,transform;
-  transition:opacity .3s ease,filter .3s ease,transform .3s ease}                 /* đóng: mờ nhanh */
-.card.open .rv{opacity:1;filter:none;transform:none;
-  transition:opacity .7s ease,filter .7s ease,transform .7s var(--ease);
+.rv{opacity:.01;transform:translateY(14px);will-change:opacity,transform;
+  transition:opacity .3s ease,transform .3s ease}                 /* đóng: mờ nhanh */
+.card.open .rv:not(.low),
+.card.expanded .rv.low{opacity:1;transform:none;
+  transition:opacity .7s ease,transform .7s var(--ease);
   transition-delay:calc(var(--d,0)*.09s + .08s)}                                   /* mở: hiện dần, lệch nhau 0,09s */
+.card.expanded .rv.low{transition-delay:calc((var(--d,0) - 3)*.09s + .05s)}
+/* đóng: mọi nội dung mờ nhanh trước khi co lại */
+.card.open.collapsing .rv,.card.open.collapsing .photo{opacity:.01;transition:opacity .25s ease,transform .25s ease;transition-delay:0s}
 .card.settled .rv{will-change:auto}
-.rv.nb{filter:none!important;transition-property:opacity,transform}
 
 .kicker{font-size:11px;font-weight:700;letter-spacing:1.8px;text-indent:1.8px;text-transform:uppercase;color:var(--muted)}
 .title{font-size:20px;font-weight:800;letter-spacing:.8px;text-indent:.8px;text-transform:uppercase;line-height:1.35;margin:1px 0 0}
@@ -105,28 +108,28 @@ button,a{-webkit-tap-highlight-color:transparent}
 .glass{
   position:relative;isolation:isolate;border-radius:14px;
   background:linear-gradient(135deg,rgba(255,255,255,.52),rgba(255,255,255,.16) 48%,rgba(255,255,255,.34));
-  -webkit-backdrop-filter:blur(10px) saturate(1.6);backdrop-filter:blur(10px) saturate(1.6);
   border:1px solid rgba(255,255,255,.7);
   box-shadow:0 8px 24px rgba(15,23,42,.12),inset 0 1px 0 rgba(255,255,255,.95),inset 1px 0 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(255,255,255,.3);
 }
+/* Blur thật của kính chỉ bật sau khi hiệu ứng mở xong (tránh tính blur mỗi khung hình lúc đang chuyển động) */
+.card.settled .glass{-webkit-backdrop-filter:blur(10px) saturate(1.6);backdrop-filter:blur(10px) saturate(1.6)}
 .glass::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
   background:radial-gradient(120% 90% at 10% -15%,rgba(255,255,255,.6),transparent 55%)}
 
 /* ===== TÂN CỬ NHÂN (ảnh nép trái) ===== */
-.hero{position:relative;display:flex;align-items:center;min-height:222px;margin:2px -18px 2px;padding-right:18px;overflow:hidden}
+.hero{position:relative;display:flex;align-items:center;min-height:260px;margin:2px -18px calc(-10px - var(--sink,6px));padding-right:18px}
+/* margin-bottom âm = triệt khoảng cách 10px tới khung bên dưới + chui --sink (px) dưới mép kính → đáy ảnh luôn sát/khít khung. Chỉnh CONFIG.portraitSink */
 /* Chỗ chèn ảnh chân dung tách nền: file portrait.png (PNG nền trong suốt, tỉ lệ 3:4, vd 660×880) */
 .photo{
-  position:absolute;left:0;top:0;width:165px;height:220px;z-index:1;
-  -webkit-mask-image:linear-gradient(to bottom,#000 82%,transparent 100%);
-  mask-image:linear-gradient(to bottom,#000 82%,transparent 100%);
-  opacity:.01;transform:translateX(-30px) scale(1.04);filter:blur(4px);will-change:opacity,transform,filter;
-  transition:opacity .3s ease,transform .3s ease,filter .3s ease;
+  position:absolute;left:0;top:0;bottom:0;width:195px;z-index:1;   /* 195×260 (3:4). Đáy ảnh = đáy khối hero */
+  opacity:.01;transform:translateX(-30px) scale(1.04);will-change:opacity,transform;
+  transition:opacity .3s ease,transform .3s ease;
 }
-.card.open .photo{opacity:1;transform:none;filter:none;
-  transition:opacity 1s var(--ease) .2s,transform 1s var(--ease) .2s,filter 1s var(--ease) .2s}
+.card.open .photo{opacity:1;transform:none;
+  transition:opacity 1s var(--ease) .2s,transform 1s var(--ease) .2s}
 .card.settled .photo{will-change:auto}
 .photo img{width:100%;height:100%;object-fit:contain;object-position:left bottom;display:block;
-  filter:drop-shadow(0 6px 10px rgba(15,23,42,.25))}
+  filter:drop-shadow(2px 4px 9px rgba(15,23,42,.24))}   /* bóng nhẹ — chỉnh độ đậm ở số .24 */
 .info{position:relative;z-index:3;margin-left:auto;width:54%;min-width:0;padding-left:4px;text-align:right}
 .badge{display:inline-block;margin-bottom:6px;padding:3px 10px;border-radius:20px;background:rgba(15,23,42,.88);
   color:#fff;font-size:9.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
@@ -135,7 +138,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 .major{font-size:11.5px;font-weight:600;color:#334155;line-height:1.35}
 
 .lead{margin-top:5px;font-size:11.5px;font-style:italic;font-weight:500;color:var(--muted)}
-.thanks{padding:10px 14px;font-size:12px;line-height:1.5;font-style:italic;font-weight:500;color:#334155}
+.thanks{z-index:3;padding:10px 14px;font-size:12px;line-height:1.5;font-style:italic;font-weight:500;color:#334155}
 
 /* ===== POLAROID ===== */
 .deck-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
@@ -237,6 +240,12 @@ button,a{-webkit-tap-highlight-color:transparent}
 .admin button.a.ok{background:#16a34a}
 .admin .link{margin-top:6px;font-size:11px;color:#94a3b8;background:none;text-decoration:underline}
 
+/* Chế độ nhẹ: tự bật trên máy yếu hoặc thêm ?lite=1 vào link (?lite=0 để tắt) */
+.lite .bg{filter:none;transform:none;transition:none;will-change:auto}
+.lite .card.settled .glass{-webkit-backdrop-filter:none;backdrop-filter:none}
+.lite .cover::before,.lite .music.playing{animation:none}
+.lite .rv,.lite .photo{will-change:auto}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}
 }
@@ -288,7 +297,7 @@ button,a{-webkit-tap-highlight-color:transparent}
         </div>
       </div>
 
-      <p class="thanks glass rv nb" style="--d:2" data-k="thanks"></p>
+      <p class="thanks glass rv" style="--d:2" data-k="thanks"></p>
 
       <div class="rv" style="--d:3">
         <div class="deck-title">📸 Khoảnh khắc thanh xuân</div>
@@ -296,7 +305,7 @@ button,a{-webkit-tap-highlight-color:transparent}
         <div class="hint">(Chạm vào xấp ảnh để lật xem tiếp)</div>
       </div>
 
-      <div class="rv nb" style="--d:4">
+      <div class="rv low" style="--d:4">
         <div class="cd-cap">Hẹn gặp sau</div>
         <div class="cd glass" id="cd">
           <div><b id="d">00</b><small>Ngày</small></div>
@@ -306,12 +315,12 @@ button,a{-webkit-tap-highlight-color:transparent}
         </div>
       </div>
 
-      <div class="details glass rv nb" style="--d:4">
+      <div class="details glass rv low" style="--d:4">
         <div class="row"><span class="ico">🕒</span><div><em>Thời gian</em><span id="when"></span></div></div>
         <div class="row"><span class="ico">📍</span><div><em>Địa điểm</em><span data-k="venue"></span>, <span data-k="address"></span></div></div>
       </div>
 
-      <div class="wish glass rv nb" style="--d:5">
+      <div class="wish glass rv low" style="--d:5">
         <div class="wish-head">
           <strong>Gửi lời chúc đến Tân cử nhân</strong>
           <span class="react">
@@ -326,7 +335,7 @@ button,a{-webkit-tap-highlight-color:transparent}
         <div class="feed" id="feed" aria-live="polite"></div>
       </div>
 
-      <footer class="rv" style="--d:5">
+      <footer class="rv low" style="--d:5">
         <div class="actions">
           <a class="btn" id="mapBtn" target="_blank" rel="noopener">🗺️ Xem bản đồ</a>
           <button class="btn alt" id="closeBtn" type="button">Đóng bìa</button>
@@ -375,6 +384,7 @@ const CONFIG = {
   thanks: '"Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"',
 
   /* --- Hình ảnh (đặt file cạnh index.html, hoặc dán link ảnh đầy đủ) --- */
+  portraitSink: 6,                // px ảnh chui xuống dưới mép khung "Sự hiện diện...". Còn hở khe giữa ảnh và khung → tăng số này (vd 10)
   portrait: 'portrait.png',       // ẢNH CHÂN DUNG TÁCH NỀN: PNG nền trong suốt, tỉ lệ 3:4 (vd 660×880), cắt từ đầu đến ngực
   photos: [                       // Xấp ảnh polaroid — thêm/bớt dòng tùy ý (nên 3–5 ảnh)
     { src: 'portrait.jpg', cap: 'Ngày đầu nhập trường' },
@@ -388,6 +398,7 @@ const CONFIG = {
                                   // Link nhạc. Ổn định nhất: tải file về repo, đặt tên music.mp3 rồi ghi 'music.mp3'. Để '' = không nhạc
   musicVolume:  0.6,              // Âm lượng tối đa 0–1 (nhạc tự tăng dần khi mở thiệp). iPhone luôn dùng âm lượng máy
   preloadMusic: true,             // true = tải sẵn nhạc lúc rảnh cho lần mở đầu mượt (tốn vài MB 4G). false = chỉ tải khi mở
+  lite:         'auto',           // Chế độ nhẹ cho máy yếu: 'auto' (tự nhận biết) / true (luôn bật) / false (luôn tắt). Thử nhanh: thêm ?lite=1 hoặc ?lite=0 vào link
   vibrate:      true,             // true = rung nhẹ khi mở thiệp / thả tim (chỉ Android)
 
   /* --- Nhận lời chúc & tim về Google Sheet (xem hướng dẫn Code.gs). Để '' = không gửi đi đâu --- */
@@ -397,8 +408,10 @@ const CONFIG = {
 
 /* --- Tinh chỉnh giao diện (ít khi cần đổi) --- */
 const DESIGN_W   = 420;   // Bề ngang thiết kế gốc (px). Thiệp tự co giãn theo bề ngang màn hình
-const COVER_H    = 740;   // Chiều cao trang bìa (px, trước khi scale). Tăng = bìa cao hơn
+const COVER_H    = 760;   // Chiều cao trang bìa (px, trước khi scale). Tăng = bìa cao hơn
 const MAX_SCALE  = 1.5;   // Phóng to tối đa trên tablet/PC (1 = không phóng to)
+const EXPAND_AT  = 750;   // ms sau khi chạm thì bung phần dưới ra (≈ lúc bìa lật xong)
+const EXPAND_MS  = 0;     // 0 = bung tức thì (mượt nhất, khuyên dùng). 300–500 = có chuyển động nhưng có thể giật trên máy yếu
 const CONFETTI_OPEN = { particleCount: 40, spread: 55, startVelocity: 30, origin: { y: .65 } };  // Pháo giấy khi mở (particleCount = số hạt; 0 = tắt)
 
 /* =====================================================================
@@ -423,6 +436,8 @@ function fitText(el, max, min) {                     // Thu nhỏ chữ dần ch
 /* ---------- Scale thiệp theo màn hình ----------
    Đang đóng (bìa): scale đều để vừa cả ngang lẫn dọc. Đã mở: chỉ theo bề ngang, nội dung dài thì cuộn. */
 document.documentElement.style.setProperty('--cover-h', COVER_H + 'px');
+document.documentElement.style.setProperty('--sink', CONFIG.portraitSink + 'px');
+document.documentElement.style.setProperty('--expand', EXPAND_MS + 'ms');
 let fullH = COVER_H;                                 // chiều cao thiệp khi đã mở (đo từ nội dung)
 const INSIDE_PAD = 40;                               // padding trên + dưới của .inside (22 + 18)
 function measureFull() {
@@ -430,13 +445,16 @@ function measureFull() {
   document.documentElement.style.setProperty('--full-h', fullH + 'px');
   return fullH;
 }
+let expanded = false;                                // đã bung phần dưới chưa
 function fitScale() {
   const open = card.classList.contains('open');
-  let s = Math.min(MAX_SCALE, (document.documentElement.clientWidth - 24) / DESIGN_W);
-  if (!open) s = Math.min(s, (innerHeight - 24) / COVER_H);
+  const sW = Math.min(MAX_SCALE, (document.documentElement.clientWidth - 24) / DESIGN_W);   // vừa bề ngang
+  const sC = Math.min(sW, (innerHeight - 24) / COVER_H);                                    // vừa cả ngang lẫn dọc (bìa)
+  const s = open ? sW : sC;
   card.style.setProperty('--s', s);
   stage.style.width = DESIGN_W * s + 'px';
-  stage.style.height = (open ? fullH : COVER_H) * s + 'px';
+  stage.style.height = (expanded ? fullH : COVER_H) * s + 'px';
+  stage.style.marginTop = Math.max(0, (innerHeight - 24 - COVER_H * sC) / 2) + 'px';       // bìa nằm giữa màn hình; mở ra thì giữ nguyên mép trên (không nhảy)
 }
 addEventListener('resize', fitScale);
 if ('ResizeObserver' in window) new ResizeObserver(() => { measureFull(); fitScale(); }).observe(card);
@@ -456,6 +474,9 @@ $('when').textContent = new Intl.DateTimeFormat('vi-VN', {
 
 /* ---------- Tên khách: lấy từ link ?khach=Tên (chủ thiệp tự ghi danh xưng, vd ?khach=Chị Lan) ---------- */
 const params = new URLSearchParams(location.search);
+const lowEnd = (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+const lite = params.has('lite') ? params.get('lite') !== '0' : CONFIG.lite === 'auto' ? !!lowEnd : !!CONFIG.lite;
+document.documentElement.classList.toggle('lite', lite);
 const cleanName = raw => raw.trim().slice(0, 40);
 const guestName = cleanName(params.get('khach') || '');
 guestEl.value = guestName || CONFIG.defaultGuest;
@@ -575,42 +596,53 @@ document.addEventListener('visibilitychange', () => {
 });
 
 /* ---------- Mở / đóng thiệp ---------- */
-let isOpen = false, settleTimer;
+let isOpen = false, busy = false, settleTimer, expandTimer, collapseTimer;
+/* MỞ: ① bìa lật + phần trên thiệp hiện (cùng cao COVER_H → khớp nhau)  ② lật xong mới bung phần dưới (đúng 1 lần, không animate layout) */
 function openCard() {
-  if (isOpen) return;
+  if (isOpen || busy) return;
   isOpen = true;
   const inside = $('inside');
+  clearTimeout(collapseTimer);
   document.body.classList.add('anim');
-  card.classList.add('open');                          // bìa bắt đầu lật ngay ở khung hình đầu
-  inside.style.height = measureFull() + 'px';          // trang trong dài ra dần (CSS transition) cùng nhịp với bìa → luôn khớp
+  measureFull();
+  card.classList.add('open');
   fitScale();
   if (CONFIG.music && musicOn) playMusic();            // phải nằm ngay trong lần chạm thì iOS mới cho phát
   buzz([15, 30, 15]);
-  /* Việc nặng dời ra sau để không tranh tài nguyên với cú lật bìa */
-  setTimeout(() => {
-    const f = CONFETTI_OPEN.particleCount > 0 && isOpen && getFx();
+  expandTimer = setTimeout(() => {
+    expanded = true;
+    inside.style.height = fullH + 'px';
+    card.classList.add('expanded');
+    fitScale();
+  }, EXPAND_AT);
+  setTimeout(() => {                                   // pháo giấy sau khi bung, tránh tranh tài nguyên với cú lật
+    const f = CONFETTI_OPEN.particleCount > 0 && !lite && isOpen && getFx();
     if (f) f(CONFETTI_OPEN);
-  }, 450);
+  }, EXPAND_AT + 400);
   setTimeout(() => {
     if (!store.get('opened', false)) { store.set('opened', true); send({ kind: 'open' }); }
-  }, 1500);
+  }, 2000);
   clearTimeout(settleTimer);
   settleTimer = setTimeout(() => {
     card.classList.add('settled');                     // nhả will-change cho nhẹ máy
-    if (isOpen) inside.style.height = 'auto';          // về tự động để theo nội dung nếu thay đổi
-  }, 3000);
+    if (isOpen) inside.style.height = 'auto';
+  }, 3500);
 }
+/* ĐÓNG: ① nội dung mờ nhanh  ② co về cao bằng bìa (tức thì) rồi bìa mới lật về → luôn khớp nhau */
 function closeCard() {
-  if (!isOpen) return;
-  isOpen = false;
+  if (!isOpen || busy) return;
+  busy = true;
+  clearTimeout(expandTimer); clearTimeout(settleTimer);
   const inside = $('inside');
-  clearTimeout(settleTimer);
-  card.classList.remove('open', 'settled');
-  inside.style.height = inside.offsetHeight + 'px';    // chốt chiều cao hiện tại (từ 'auto' thì CSS không chạy được chuyển động)
-  void inside.offsetHeight;
-  inside.style.height = COVER_H + 'px';                // co lại dần cùng nhịp với bìa lật về
-  fitScale();
+  card.classList.add('collapsing');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  collapseTimer = setTimeout(() => {
+    expanded = false;
+    inside.style.height = COVER_H + 'px';
+    card.classList.remove('open', 'expanded', 'collapsing', 'settled');
+    isOpen = false; busy = false;
+    fitScale();
+  }, 280);
 }
 $('cover').onclick = openCard;
 $('closeBtn').onclick = closeCard;
