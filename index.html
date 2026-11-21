@@ -13,6 +13,8 @@
      Mở bảng tạo link:  .../index.html?admin=1
   5) Đổi màu: CSS biến ở đầu phần <style> (:root). Đổi chữ cố định ("Tân Cử Nhân", "Khoảnh khắc thanh xuân"...): tìm trực tiếp trong phần HTML.
   6) Muốn nhận lời chúc/tim: làm theo hướng dẫn Code.gs rồi điền wishEndpoint + token trong CONFIG.
+  7) Bật/tắt từng hiệu ứng (nhòe dần, kính mờ, zoom nền, pháo giấy, sao, rung...): khối EFFECTS ngay dưới CONFIG (true = bật, false = tắt).
+  8) Ảnh chân dung to/nhỏ: CONFIG.portraitWidth (chiều cao tự theo tỉ lệ 3:4, bìa tự cao thêm cho vừa).
 -->
 <html lang="vi">
 <head>
@@ -91,6 +93,17 @@ button,a{-webkit-tap-highlight-color:transparent}
 /* đóng: mọi nội dung mờ nhanh trước khi co lại */
 .card.open.collapsing .rv,.card.open.collapsing .photo{opacity:.01;transition:opacity .25s ease,transform .25s ease;transition-delay:0s}
 .card.settled .rv{will-change:auto}
+/* ===== Công tắc hiệu ứng (bật/tắt trong khối EFFECTS ở script) ===== */
+.fx-blur-in .rv,.fx-blur-in .photo{filter:blur(4px);transition-property:opacity,transform,filter}
+.fx-blur-in .card.open .rv:not(.low),.fx-blur-in .card.expanded .rv.low{filter:none;transition-property:opacity,transform,filter}
+.fx-blur-in .card.open .photo{filter:none;transition-property:opacity,transform,filter}
+.no-slide-up .rv{transform:none}
+.no-bg-zoom .bg{transform:none;transition:none}
+.no-glass-blur .card.settled .glass{-webkit-backdrop-filter:none;backdrop-filter:none}
+.no-cover-shine .cover::before{display:none}
+.no-cover-flip .card.open .cover{transform:none}
+.no-pulse-button .open-btn,.no-music-spin .music.playing{animation:none}
+.no-portrait-shadow .photo img{filter:none}
 
 .kicker{font-size:11px;font-weight:700;letter-spacing:1.8px;text-indent:1.8px;text-transform:uppercase;color:var(--muted)}
 .title{font-size:20px;font-weight:800;letter-spacing:.8px;text-indent:.8px;text-transform:uppercase;line-height:1.35;margin:1px 0 0}
@@ -117,11 +130,11 @@ button,a{-webkit-tap-highlight-color:transparent}
   background:radial-gradient(120% 90% at 10% -15%,rgba(255,255,255,.6),transparent 55%)}
 
 /* ===== TÂN CỬ NHÂN (ảnh nép trái) ===== */
-.hero{position:relative;display:flex;align-items:center;min-height:260px;margin:2px -18px calc(-10px - var(--sink,6px));padding-right:18px}
+.hero{position:relative;display:flex;align-items:center;min-height:calc(var(--pw,240px) * 4 / 3);margin:2px -18px calc(-10px - var(--sink,6px));padding-right:18px}
 /* margin-bottom âm = triệt khoảng cách 10px tới khung bên dưới + chui --sink (px) dưới mép kính → đáy ảnh luôn sát/khít khung. Chỉnh CONFIG.portraitSink */
 /* Chỗ chèn ảnh chân dung tách nền: file portrait.png (PNG nền trong suốt, tỉ lệ 3:4, vd 660×880) */
 .photo{
-  position:absolute;left:0;top:0;bottom:0;width:195px;z-index:1;   /* 195×260 (3:4). Đáy ảnh = đáy khối hero */
+  position:absolute;left:0;top:0;bottom:0;width:var(--pw,240px);z-index:1;   /* rộng = CONFIG.portraitWidth, cao theo 3:4. Đáy ảnh = đáy khối hero */
   opacity:.01;transform:translateX(-30px) scale(1.04);will-change:opacity,transform;
   transition:opacity .3s ease,transform .3s ease;
 }
@@ -130,7 +143,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 .card.settled .photo{will-change:auto}
 .photo img{width:100%;height:100%;object-fit:contain;object-position:left bottom;display:block;
   filter:drop-shadow(2px 4px 9px rgba(15,23,42,.24))}   /* bóng nhẹ — chỉnh độ đậm ở số .24 */
-.info{position:relative;z-index:3;margin-left:auto;width:54%;min-width:0;padding-left:4px;text-align:right}
+.info{position:relative;z-index:3;margin-left:auto;width:calc(100% - var(--pw,240px) + 30px);min-width:0;padding-left:4px;text-align:right}
 .badge{display:inline-block;margin-bottom:6px;padding:3px 10px;border-radius:20px;background:rgba(15,23,42,.88);
   color:#fff;font-size:9.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
 /* Tên luôn 1 dòng: nowrap + JS tự thu nhỏ chữ nếu tên quá dài */
@@ -244,7 +257,7 @@ button,a{-webkit-tap-highlight-color:transparent}
 .lite .bg{filter:none;transform:none;transition:none;will-change:auto}
 .lite .card.settled .glass{-webkit-backdrop-filter:none;backdrop-filter:none}
 .lite .cover::before,.lite .music.playing{animation:none}
-.lite .rv,.lite .photo{will-change:auto}
+.lite .rv,.lite .photo{will-change:auto;filter:none!important}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}
@@ -384,6 +397,7 @@ const CONFIG = {
   thanks: '"Sự hiện diện của bạn là niềm vinh hạnh lớn, đánh dấu cột mốc ý nghĩa trên chặng đường mới của mình. Chân thành cảm ơn bạn vì luôn đồng hành!"',
 
   /* --- Hình ảnh (đặt file cạnh index.html, hoặc dán link ảnh đầy đủ) --- */
+  portraitWidth: 240,             // px chiều rộng ảnh chân dung (cao = rộng × 4/3). To hơn → tăng số này (vd 260). Bìa tự cao thêm cho vừa
   portraitSink: 6,                // px ảnh chui xuống dưới mép khung "Sự hiện diện...". Còn hở khe giữa ảnh và khung → tăng số này (vd 10)
   portrait: 'portrait.png',       // ẢNH CHÂN DUNG TÁCH NỀN: PNG nền trong suốt, tỉ lệ 3:4 (vd 660×880), cắt từ đầu đến ngực
   photos: [                       // Xấp ảnh polaroid — thêm/bớt dòng tùy ý (nên 3–5 ảnh)
@@ -399,18 +413,40 @@ const CONFIG = {
   musicVolume:  0.6,              // Âm lượng tối đa 0–1 (nhạc tự tăng dần khi mở thiệp). iPhone luôn dùng âm lượng máy
   preloadMusic: true,             // true = tải sẵn nhạc lúc rảnh cho lần mở đầu mượt (tốn vài MB 4G). false = chỉ tải khi mở
   lite:         'auto',           // Chế độ nhẹ cho máy yếu: 'auto' (tự nhận biết) / true (luôn bật) / false (luôn tắt). Thử nhanh: thêm ?lite=1 hoặc ?lite=0 vào link
-  vibrate:      true,             // true = rung nhẹ khi mở thiệp / thả tim (chỉ Android)
 
   /* --- Nhận lời chúc & tim về Google Sheet (xem hướng dẫn Code.gs). Để '' = không gửi đi đâu --- */
   wishEndpoint: '',               // URL Web app Apps Script (kết thúc bằng /exec)
   token: 'doi-chuoi-bi-mat-cua-ban'   // Phải trùng TOKEN trong Code.gs
 };
 
+/* =====================================================================
+   ✨ BẬT / TẮT HIỆU ỨNG — đổi true (bật) / false (tắt). Máy yếu giật thì tắt bớt các mục đánh dấu (nặng)
+   ===================================================================== */
+const EFFECTS = {
+  blurIn:         false,   // Nội dung nhòe dần → rõ nét khi hiện          (nặng — mặc định tắt cho mượt)
+  glassBlur:      true,    // Hộp kính mờ (blur nền phía sau hộp chữ)      (nặng)
+  bgZoom:         true,    // Ảnh nền zoom nhẹ khi mở thiệp
+  slideUp:        true,    // Các khối chữ trượt nhẹ từ dưới lên khi hiện
+  coverFlip:      true,    // Bìa lật 3D khi mở (false = bìa chỉ mờ đi)
+  coverShine:     true,    // Vệt sáng tráng gương chạy ngang bìa
+  pulseButton:    true,    // Nút "Chạm để mở thiệp" nhấp nhô
+  openConfetti:   true,    // Pháo giấy khi mở thiệp (số hạt: CONFETTI_OPEN bên dưới)
+  reactConfetti:  true,    // Pháo nhỏ khi bấm thả tim / mũ
+  touchStars:     true,    // Sao bay lên khi chạm vào chỗ trống trên thiệp
+  portraitShadow: true,    // Bóng đổ nhẹ quanh ảnh chân dung
+  musicSpin:      true,    // Nút nhạc xoay khi đang phát
+  vibrate:        true     // Rung nhẹ khi mở thiệp / thả tim (chỉ Android)
+};
+/* Áp dụng công tắc: thêm class vào <html> (CSS ở trên đọc các class này) */
+Object.entries(EFFECTS).forEach(([k, on]) =>
+  document.documentElement.classList.add((on ? 'fx-' : 'no-') + k.replace(/[A-Z]/g, c => '-' + c.toLowerCase())));
+
 /* --- Tinh chỉnh giao diện (ít khi cần đổi) --- */
 const DESIGN_W   = 420;   // Bề ngang thiết kế gốc (px). Thiệp tự co giãn theo bề ngang màn hình
-const COVER_H    = 760;   // Chiều cao trang bìa (px, trước khi scale). Tăng = bìa cao hơn
+const COVER_H    = 760 + Math.max(0, Math.round(CONFIG.portraitWidth * 4 / 3 - 260));   // Chiều cao trang bìa (px, trước khi scale). Tự tăng theo cỡ ảnh chân dung; muốn bìa cao hơn nữa thì cộng thêm số vào cuối
 const MAX_SCALE  = 1.5;   // Phóng to tối đa trên tablet/PC (1 = không phóng to)
 const EXPAND_AT  = 750;   // ms sau khi chạm thì bung phần dưới ra (≈ lúc bìa lật xong)
+const SETTLE_MS  = 2500;  // ms sau khi mở thì kính mờ (blur) mới bật. Nhỏ hơn = blur hiện sớm hơn (nhưng dễ giật hơn lúc đang chuyển động)
 const EXPAND_MS  = 0;     // 0 = bung tức thì (mượt nhất, khuyên dùng). 300–500 = có chuyển động nhưng có thể giật trên máy yếu
 const CONFETTI_OPEN = { particleCount: 40, spread: 55, startVelocity: 30, origin: { y: .65 } };  // Pháo giấy khi mở (particleCount = số hạt; 0 = tắt)
 
@@ -427,7 +463,7 @@ const store = {
 };
 const pad = n => String(n).padStart(2, '0');
 const startAt = new Date(CONFIG.start);
-const buzz = p => { if (CONFIG.vibrate) try { navigator.vibrate && navigator.vibrate(p); } catch {} };
+const buzz = p => { if (EFFECTS.vibrate) try { navigator.vibrate && navigator.vibrate(p); } catch {} };
 function fitText(el, max, min) {                     // Thu nhỏ chữ dần cho vừa 1 dòng
   let fs = max; el.style.fontSize = fs + 'px';
   while (el.scrollWidth > el.clientWidth && fs > min) el.style.fontSize = (--fs) + 'px';
@@ -437,6 +473,7 @@ function fitText(el, max, min) {                     // Thu nhỏ chữ dần ch
    Đang đóng (bìa): scale đều để vừa cả ngang lẫn dọc. Đã mở: chỉ theo bề ngang, nội dung dài thì cuộn. */
 document.documentElement.style.setProperty('--cover-h', COVER_H + 'px');
 document.documentElement.style.setProperty('--sink', CONFIG.portraitSink + 'px');
+document.documentElement.style.setProperty('--pw', CONFIG.portraitWidth + 'px');
 document.documentElement.style.setProperty('--expand', EXPAND_MS + 'ms');
 let fullH = COVER_H;                                 // chiều cao thiệp khi đã mở (đo từ nội dung)
 const INSIDE_PAD = 40;                               // padding trên + dưới của .inside (22 + 18)
@@ -616,7 +653,7 @@ function openCard() {
     fitScale();
   }, EXPAND_AT);
   setTimeout(() => {                                   // pháo giấy sau khi bung, tránh tranh tài nguyên với cú lật
-    const f = CONFETTI_OPEN.particleCount > 0 && !lite && isOpen && getFx();
+    const f = EFFECTS.openConfetti && CONFETTI_OPEN.particleCount > 0 && !lite && isOpen && getFx();
     if (f) f(CONFETTI_OPEN);
   }, EXPAND_AT + 400);
   setTimeout(() => {
@@ -626,7 +663,7 @@ function openCard() {
   settleTimer = setTimeout(() => {
     card.classList.add('settled');                     // nhả will-change cho nhẹ máy
     if (isOpen) inside.style.height = 'auto';
-  }, 3500);
+  }, SETTLE_MS);
 }
 /* ĐÓNG: ① nội dung mờ nhanh  ② co về cao bằng bìa (tức thì) rồi bìa mới lật về → luôn khớp nhau */
 function closeCard() {
@@ -661,7 +698,7 @@ addEventListener('load', () => (window.requestIdleCallback || (f => setTimeout(f
 
 /* ---------- Hiệu ứng nhỏ ---------- */
 $('inside').addEventListener('click', e => {         // sao bay khi chạm vào chỗ trống
-  if (e.target.closest('button,a,input,form,.stack')) return;
+  if (!EFFECTS.touchStars || e.target.closest('button,a,input,form,.stack')) return;
   const s = document.createElement('div');
   s.className = 'touch-star';
   s.textContent = ['✨', '⭐', '🎓', '💛'][Math.floor(Math.random() * 4)];
@@ -720,7 +757,7 @@ showCounts();
 document.querySelectorAll('[data-react]').forEach(b => b.onclick = () => {
   counts[b.dataset.react]++; store.set('reacts', counts); showCounts(); queueReact(b.dataset.react);
   buzz(12);
-  const f = getFx();
+  const f = EFFECTS.reactConfetti && getFx();
   if (f) {
     const r = b.getBoundingClientRect();
     f({
