@@ -66,7 +66,7 @@ button,a{-webkit-tap-highlight-color:transparent}
   position:relative;overflow:hidden;border-radius:24px;background:#f8fafc;
   box-shadow:0 25px 50px rgba(15,23,42,.18);padding:22px 18px 18px;text-align:center;
   display:flex;flex-direction:column;gap:10px;height:var(--cover-h,740px);contain:paint;
-  transition:height var(--expand,0s) var(--flip),opacity .4s ease .6s;   /* height: mặc định bung tức thì (0s) — xem EXPAND_MS. opacity: hiện lại sau khi bìa úp xong */
+  transition:height var(--expand,0s) var(--flip);   /* mặc định bung tức thì (0s) — xem EXPAND_MS; lúc đóng JS tạm đặt CLOSE_SHRINK_MS */
 }
 /* Blur nền áp thẳng lên ảnh (rẻ hơn backdrop-filter phủ cả thiệp khi ảnh đang zoom) */
 .bg{position:absolute;top:-6px;left:-6px;right:-6px;height:calc(var(--full-h,1100px) + 12px);background:url('bg.jpg') center bottom/cover;filter:blur(2.5px);
@@ -92,7 +92,6 @@ button,a{-webkit-tap-highlight-color:transparent}
 .card.expanded .rv.low{transition-delay:calc((var(--d,0) - 3)*.09s + .05s)}
 /* đóng: mọi nội dung mờ nhanh trước khi co lại */
 .card.open.collapsing .rv,.card.open.collapsing .photo{opacity:.01;transition:opacity .25s ease,transform .25s ease;transition-delay:0s}
-.card.collapsing .inside{opacity:0;transition:height var(--expand,0s) var(--flip),opacity .28s ease}   /* đóng: cả trang trong mờ đi rồi mới co lại → không bị nhảy */
 .card.settled .rv{will-change:auto}
 /* ===== Công tắc hiệu ứng (bật/tắt trong khối EFFECTS ở script) ===== */
 .fx-blur-in .rv,.fx-blur-in .photo{filter:blur(4px);transition-property:opacity,transform,filter}
@@ -156,6 +155,9 @@ button,a{-webkit-tap-highlight-color:transparent}
 .major{font-size:11.5px;font-weight:600;color:#334155;line-height:1.35}
 
 .lead{margin-top:5px;font-size:11.5px;font-style:italic;font-weight:500;color:var(--muted)}
+.ch{transition:color .25s}
+.ch.lt{color:#fff;text-shadow:0 1px 3px rgba(15,23,42,.5)}                          /* chữ bị áo tối che → tự chuyển trắng */
+.badge.inv{background:rgba(255,255,255,.92);color:var(--ink);box-shadow:0 1px 4px rgba(15,23,42,.25)}   /* huy hiệu bị áo tối che → đảo màu */
 .thanks{z-index:3;padding:10px 14px;font-size:12px;line-height:1.5;font-style:italic;font-weight:500;color:#334155}
 
 /* ===== POLAROID ===== */
@@ -441,6 +443,7 @@ const EFFECTS = {
   openConfetti:   true,    // Pháo giấy khi mở thiệp (số hạt: CONFETTI_OPEN bên dưới)
   reactConfetti:  true,    // Pháo nhỏ khi bấm thả tim / mũ
   touchStars:     true,    // Sao bay lên khi chạm vào chỗ trống trên thiệp
+  autoContrast:   true,    // Chữ (tên, chuyên ngành) tự đổi màu tương phản nơi bị áo/ảnh chân dung che
   portraitShadow: true,    // Bóng đổ nhẹ quanh ảnh chân dung
   musicSpin:      true,    // Nút nhạc xoay khi đang phát
   vibrate:        true     // Rung nhẹ khi mở thiệp / thả tim (chỉ Android)
@@ -455,6 +458,7 @@ const COVER_H    = 760 + Math.max(0, CONFIG.portraitHeight - 260);   // Chiều 
 const MAX_SCALE  = 1.5;   // Phóng to tối đa trên tablet/PC (1 = không phóng to)
 const EXPAND_AT  = 750;   // ms sau khi chạm thì bung phần dưới ra (≈ lúc bìa lật xong)
 const SETTLE_MS  = 2500;  // ms sau khi mở thì kính mờ (blur) mới bật. Nhỏ hơn = blur hiện sớm hơn (nhưng dễ giật hơn lúc đang chuyển động)
+const CLOSE_SHRINK_MS = 350;   // ms thiệp co lại khi đóng (cùng lúc bìa lật về). Nhỏ = nhanh hơn / ít tốn máy hơn
 const EXPAND_MS  = 0;     // 0 = bung tức thì (mượt nhất, khuyên dùng). 300–500 = có chuyển động nhưng có thể giật trên máy yếu
 const CONFETTI_OPEN = { particleCount: 40, spread: 55, startVelocity: 30, origin: { y: .65 } };  // Pháo giấy khi mở (particleCount = số hạt; 0 = tắt)
 
@@ -509,7 +513,22 @@ if ('ResizeObserver' in window) new ResizeObserver(() => { measureFull(); fitSca
 /* ---------- Đổ dữ liệu từ CONFIG vào thiệp ---------- */
 document.querySelectorAll('[data-k]').forEach(el => el.textContent = CONFIG[el.dataset.k]);
 $('name').textContent = CONFIG.graduate;
+/* Tách từng ký tự thành <span class="ch"> để mỗi chữ tự chọn màu tương phản với phần ảnh nằm ngay phía sau nó */
+function splitChars(el) {
+  [...el.childNodes].forEach(n => {
+    if (n.nodeType === 3) {
+      const f = document.createDocumentFragment();
+      Array.from(n.textContent.normalize('NFC')).forEach(c => {
+        if (c === ' ') f.appendChild(document.createTextNode(' '));
+        else { const sp = document.createElement('span'); sp.className = 'ch'; sp.textContent = c; f.appendChild(sp); }
+      });
+      n.replaceWith(f);
+    } else if (n.nodeType === 1 && !n.classList.contains('ch')) splitChars(n);
+  });
+}
+document.querySelectorAll('.name, .major').forEach(splitChars);
 /* Ảnh chân dung: đo vùng có hình người (bỏ phần trong suốt thừa) rồi phóng cho người cao đúng portraitHeight, đáy chạm đáy khối */
+let PD = null;                                        // dữ liệu điểm ảnh của ảnh chân dung (để đo màu phía sau chữ)
 function fitPortrait() {
   const img = $('portrait'), root = document.documentElement.style;
   try {
@@ -531,6 +550,7 @@ function fitPortrait() {
     if (fw * W > CONFIG.portraitMaxWidth) { W = CONFIG.portraitMaxWidth / fw; H = W * nh / nw; }   // quá rộng → co theo bề ngang
     root.setProperty('--fw', fw * W + 'px');                      // rộng khung = rộng người
     root.setProperty('--ph', fh * H + 'px');                      // cao khung = cao người
+    PD = { w, h, data: d, W, H, il: -fx * W, fy };
     root.setProperty('--iw', W + 'px'); root.setProperty('--ih', H + 'px');
     root.setProperty('--il', -fx * W + 'px');                     // dịch ảnh để mép trái người sát mép trái khung
     root.setProperty('--ib', -(1 - fy - fh) * H + 'px');          // dịch ảnh để mép dưới người sát đáy khung
@@ -557,7 +577,45 @@ const cleanName = raw => raw.trim().slice(0, 40);
 const guestName = cleanName(params.get('khach') || '');
 guestEl.value = guestName || CONFIG.defaultGuest;
 
-const fitAll = () => { fitText($('name'), 22, 11); fitText(guestEl, 20, 12); measureFull(); fitScale(); };
+/* Chữ nào nằm trên phần áo/ảnh có màu gần màu chữ thì tự đổi màu để rõ chữ (làm theo từng ký tự) */
+function contrastText() {
+  if (!EFFECTS.autoContrast || !PD) return;
+  const hero = document.querySelector('.hero'), photo = document.querySelector('.photo');
+  const pL = photo.offsetLeft, pT = photo.offsetTop, pW = photo.offsetWidth, pH = photo.offsetHeight;
+  const fade = Math.min(CONFIG.portraitFade, pW), imgTop = -PD.fy * PD.H;
+  const BG_L = .82, INK_L = .009, SLATE_L = .08;      // độ sáng nền thiệp / chữ đậm / chữ chuyên ngành
+  const lin = v => (v /= 255) <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4);
+  const lum = (r, g, b) => .2126 * lin(r) + .7152 * lin(g) + .0722 * lin(b);
+  const posIn = el => {                                // vị trí phần tử trong .hero (đọc theo bố cục nên không lệch do animation)
+    let x = 0, y = 0, n = el;
+    while (n && n !== hero) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+    return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+  };
+  const under = r => {                                 // độ sáng trung bình phía sau 1 ô chữ (ảnh người trộn với nền sáng)
+    let sum = 0;
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+      const sx = r.x + r.w * (i + .5) / 4 - pL, sy = r.y + r.h * (j + .5) / 4 - pT;
+      let a = 0, L = 0;
+      if (sx >= 0 && sx <= pW && sy >= 0 && sy <= pH) {
+        const ix = Math.min(PD.w - 1, Math.max(0, Math.floor((sx - PD.il) / PD.W * PD.w)));
+        const iy = Math.min(PD.h - 1, Math.max(0, Math.floor((sy - imgTop) / PD.H * PD.h)));
+        const k = (iy * PD.w + ix) * 4;
+        a = PD.data[k + 3] / 255 * (fade > 0 ? Math.min(1, Math.max(0, (pW - sx) / fade)) : 1);   // tính cả vùng mờ viền phải
+        L = lum(PD.data[k], PD.data[k + 1], PD.data[k + 2]);
+      }
+      sum += a * L + (1 - a) * BG_L;
+    }
+    return sum / 16;
+  };
+  document.querySelectorAll('.name .ch, .major .ch').forEach(ch => {
+    const Lu = under(posIn(ch)), ink = ch.closest('.major') ? SLATE_L : INK_L;
+    const cInk = (Math.max(Lu, ink) + .05) / (Math.min(Lu, ink) + .05);   // độ tương phản của chữ đậm với nền phía sau
+    ch.classList.toggle('lt', cInk < 3.2 && 1.05 / (Lu + .05) > cInk);     // kém → chuyển sang chữ trắng
+  });
+  const b = document.querySelector('.badge');
+  if (b) b.classList.toggle('inv', under(posIn(b)) < .12);
+}
+const fitAll = () => { fitText($('name'), 22, 11); fitText(guestEl, 20, 12); measureFull(); fitScale(); contrastText(); };
 fitAll();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
 addEventListener('load', fitAll);
@@ -703,26 +761,32 @@ function openCard() {
     if (isOpen) inside.style.height = 'auto';
   }, SETTLE_MS);
 }
-/* ĐÓNG: ① cuộn về đầu trang + nội dung & trang trong mờ dần  ② khi đã yên mới co về cao bằng bìa  ③ bìa lật về → không có cú nhảy nào */
+/* ĐÓNG: ① cuộn về đầu trang, nội dung mờ nhanh (trang trong + nền vẫn còn)  ② bìa lật về CÙNG LÚC thiệp co lại ngắn
+   (bìa luôn cao bằng thiệp nên khớp nhau) → giữ đúng cảm giác "gập bìa lại", không bị trống màn hình */
 function closeCard() {
   if (!isOpen || busy) return;
   busy = true;
   clearTimeout(expandTimer); clearTimeout(settleTimer);
+  const inside = $('inside');
   card.classList.remove('settled');                    // tắt blur kính trước cho nhẹ
   card.classList.add('collapsing');
+  inside.style.height = inside.offsetHeight + 'px';    // chốt chiều cao thật (từ 'auto' thì CSS không chạy được chuyển động)
   window.scrollTo({ top: 0, behavior: 'smooth' });
   const t0 = performance.now();
-  (function waitQuiet() {                              // chờ cuộn xong + mờ xong (tránh trang bị giật khi co lại lúc đang cuộn)
+  (function waitQuiet() {                              // chờ cuộn xong + nội dung mờ xong
     const t = performance.now() - t0;
     if ((t > 300 && scrollY < 2) || t > 900) finishClose(); else requestAnimationFrame(waitQuiet);
   })();
 }
 function finishClose() {
+  const inside = $('inside');
   expanded = false;
-  $('inside').style.height = COVER_H + 'px';
-  card.classList.remove('open', 'expanded', 'collapsing');
+  inside.style.transition = `height ${CLOSE_SHRINK_MS}ms var(--flip)`;   // co lại ngắn, đồng nhịp với cú lật bìa
+  inside.style.height = COVER_H + 'px';
+  card.classList.remove('open', 'expanded', 'collapsing');               // bìa bắt đầu lật về
   isOpen = false; busy = false;
   fitScale();
+  setTimeout(() => { inside.style.transition = ''; }, CLOSE_SHRINK_MS + 60);
 }
 $('cover').onclick = openCard;
 $('closeBtn').onclick = closeCard;
